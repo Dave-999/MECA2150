@@ -51,8 +51,8 @@ if cycle == 2
     unit5=uicontrol ( fig , 'style' , ' text' , 'position', [230,200,30,15] , 'string' , '[/]' );
     
     text6 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,200,50,15] , 'Max' , 1 , 'string' , '1323.15' );
-    ui6=uicontrol ( fig , 'style' , ' text' , 'position', [280,192,150,30] , 'string' , 'Combustion exit temperature T3 (must be =<1323.15)' );
-    unit6=uicontrol ( fig , 'style' , ' text' , 'position', [500,200,30,15] , 'string' , '[K]' );
+    ui6=uicontrol ( fig , 'style' , ' text' , 'position', [280,192,150,30] , 'string' , 'Combustion exit temperature T3 (must be =< 1150)' );
+    unit6=uicontrol ( fig , 'style' , ' text' , 'position', [500,200,30,15] , 'string' , '[C]' );
     
     text7 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,147,50,20] , 'Max' , 1 , 'string' , '0.90' );
     ui7=uicontrol ( fig , 'style' , ' text' , 'position', [10,142,150,30] , 'string' , 'Compressor polytropic efficiency (eta_piC)' );
