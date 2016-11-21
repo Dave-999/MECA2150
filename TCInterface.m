@@ -73,7 +73,7 @@ if cycle == 2
     bp1= uicontrol ( fig , 'style' , 'push' , 'position' , [420 40 60 30 ] ,...
         'string' , 'Start' , 'callback' , @(bp1,eventdata)TCInterface2(bp1,eventdata,get(choix1,'Value')))
     
-    %TCGas(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
+    %GasTurbine(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
 end
 
 end

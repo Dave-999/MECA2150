@@ -1,5 +1,5 @@
-%function [] = TCGaz(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
-function [] = TCGas()
+%function [] = GasTurbine(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
+function [] = GasTurbine()
 %A faire varier:
 
 P_e=230*10^6;
@@ -7,9 +7,9 @@ fuel = 'methane';
 eta_piC=0.9;
 eta_piT=0.9;
 k_mec=0.015;
-T3=1050+273.15;%valeur max 
+T3=1050+273.15; %valeur max 
 k_cc=0.95;
-lambda=1; %Excès d'air
+lambda=1.04; %Exces d'air
 
 if fuel =='methane'
 methane=true;
@@ -33,7 +33,7 @@ gamma=1.4;
 %m_a=lambda*m_a1*m_c;
 %m_g=m_a+m_c;
 r=10;
-T1=50+273.15;
+T1=50+273.15; 
 p1=10^5; %[Pa]
 p2=p1*r;
 p3=p2*k_cc;
@@ -44,7 +44,7 @@ T2=T1*r^((gamma-1)/gamma/eta_piC);
 T4=T3*(p3/p4)^(-eta_piT*(gamma-1)/gamma);
 
 m_12=(1-((gamma-1)/gamma/eta_piC))^-1; %Polytropic coefficients
-m_34=(1-((gamma-1)/gamma*eta_piC))^-1;
+m_34=(1-((gamma-1)/gamma*eta_piT))^-1;
 
 h2=(x_O2*janaf('h','O2',T2)+(1-x_O2)*janaf('h','N2',T2))*1000; %[J/kg]
 
@@ -54,10 +54,12 @@ else
 end
 
 syms ma mc
-[m_a, m_c] = vpasolve([...
-    lambda*m_a1 == ma/mc,...
-    P_e==(ma*(x_O2*janaf('h','O2',T3)*1000+(1-x_O2)*janaf('h','N2',T3)*1000)+mc*get_methane('h',T3))-(ma*(x_O2*janaf('h','O2',T4)*1000+(1-x_O2)*janaf('h','N2',T4)*1000)+mc*get_methane('h',T4))*(1-k_mec)-ma*(h2-h1)*(1+k_mec)],... %Eq 3.1
-    [ma, mc]);
+[m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,...
+    P_e == (ma*(x_O2*janaf('h','O2',T3)*1000+(1-x_O2)*janaf('h','N2',T3)*1000)...
+    +mc*get_methane('h',T3))-(ma*(x_O2*janaf('h','O2',T4)*1000+(1-x_O2)...
+    *janaf('h','N2',T4)*1000)+mc*get_methane('h',T4))*(1-k_mec)-ma*(h2-h1)...
+    *(1+k_mec)],[ma, mc]); %Eq 3.1
+    
 
 m_g=m_a+m_c;
 %get_enthalpy_methane(T3)
