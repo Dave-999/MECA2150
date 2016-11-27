@@ -11,10 +11,10 @@ T3=1050+273.15; %valeur max
 k_cc=0.95;
 lambda=1.04; %Exces d'air
 
-if fuel =='methane'
+if strcmp(fuel,'methane')
 methane=true;
 else
-kerosene=true;
+diezel=true;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,17 +49,17 @@ m_34=(1-((gamma-1)/gamma*eta_piT))^-1;
 h2=(x_O2*janaf('h','O2',T2)+(1-x_O2)*janaf('h','N2',T2))*1000; %[J/kg]
 
 if methane
-    m_a1=4/x_O2;
-else
-end
+    m_a1=2*2/x_O2; %CH4 + 2 O2 = CO2 + 2 H2O
 
-syms ma mc
+    syms ma mc
 [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,...
     P_e == (ma*(x_O2*janaf('h','O2',T3)*1000+(1-x_O2)*janaf('h','N2',T3)*1000)...
     +mc*get_methane('h',T3))-(ma*(x_O2*janaf('h','O2',T4)*1000+(1-x_O2)...
     *janaf('h','N2',T4)*1000)+mc*get_methane('h',T4))*(1-k_mec)-ma*(h2-h1)...
     *(1+k_mec)],[ma, mc]); %Eq 3.1
-    
+else
+    m_a1=(71/4)*(32/167)/x_O2; %4 C12H23 + 71 O2 = 48 CO2 + 46 H2O
+end
 
 m_g=m_a+m_c;
 %get_enthalpy_methane(T3)
@@ -120,11 +120,11 @@ end
 for i= 1:length_T
     s_41(i)=(m_a*(x_O2*(janaf('s','O2',T_41(i)+R/32*log(p_41/p4)))+(1-x_O2)*janaf('s','N2',T_41(i)+R/14*log(p_41/p4))) + m_c*get_methane('s',T_41(i),p_41))/m_g;
 end
-plot(T_12,s_12)
+plot(s_12,T_12)
 hold on;
-plot(T_23,s_23)
-plot(T_34,s_34)
-plot(T_41,s_41)
+plot(s_23,T_23)
+plot(s_34,T_34)
+plot(s_41,T_41)
 
 
 %Energetic efficiency

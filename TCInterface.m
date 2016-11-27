@@ -43,7 +43,7 @@ if cycle == 2
     ui3=uicontrol ( fig , 'style' , ' text' , 'position', [10,240,150,15] , 'string' , 'Turbine power' );
     unit3=uicontrol ( fig , 'style' , ' text' , 'position', [230,240,30,15] , 'string' , '[MW]' );
     
-    text4 = uicontrol ( gcf , 'Style' , 'popup' , 'String' , 'Methane|Kerosene' , 'Position' , [440 242 100 15] );
+    text4 = uicontrol ( gcf , 'Style' , 'popup' , 'String' , 'Methane|Diezel' , 'Position' , [440 242 100 15] );
     ui4=uicontrol ( fig , 'style' , ' text' , 'position', [280, 238 ,150,15] , 'string' , 'Fuel type' );
 
     text5 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,200,50,15] , 'Max' , 1 , 'string' , '0.95');
