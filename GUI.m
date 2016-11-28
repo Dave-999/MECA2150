@@ -1,5 +1,5 @@
 %Fenêtre de choix
-function [] = TCInterface1()
+function [] = GUI_1()
 fig=figure('color',[0.2 0.5 0.8],'name','Thermal cycles simulator interface')
 text1 = uicontrol( fig , 'style' , 'text' , 'position' , [200,300,170,30] ,...
     'string' , 'Hello' , 'fontsize' , 15 )
@@ -8,15 +8,16 @@ text2 = uicontrol( fig , 'style' , 'text' , 'position' , [50,200,500,30] ,...
 choix1 = uicontrol ( gcf , 'Style' , 'popup' , 'String' , 'Steam power plant|Gas turbine|Combined cycle power plant' , 'Position' , [150 50 170 80] );
 
 bp1= uicontrol ( fig , 'style' , 'push' , 'position' , [330 105 60 30 ] ,...
-    'string' , 'Confirm' , 'callback' , @(bp1,eventdata)TCInterface2(bp1,eventdata,get(choix1,'Value')))
+    'string' , 'Confirm' , 'callback' , @(bp1,eventdata)GUI_2(bp1,eventdata,get(choix1,'Value')))
 
 end
 
-function [] = TCInterface2(bp,eventdata,cycle)
+function [] = GUI_2(bp,eventdata,cycle)
 
 %%%%%%%%%%%%%%%%
 %Cycle à vapeur%
 %%%%%%%%%%%%%%%%
+
 if cycle==1
     fig=figure('color',[0.2 0.5 0.8],'name','Steam power plant simulator initerface')
     text3 = uicontrol( fig , 'style' , 'text' , 'position' , [170,300,230,30] ,...
@@ -31,7 +32,7 @@ end
 %%%%%%%%%%%%%
 
 if cycle == 2
-    fig=figure('color',[0.9 0.6 0.3],'name','Gas turbine simulator interface ')
+    fig=figure('color',[0.9 0.6 0.3],'name','Gas turbine simulator interface')
       
     text1 = uicontrol( fig , 'style' , 'text' , 'position' , [200,350,170,30] ,...
         'string' , 'Gas turbine' , 'fontsize' , 15 )
@@ -71,10 +72,9 @@ if cycle == 2
     unit10=uicontrol ( fig , 'style' , ' text' , 'position', [500,108,30,15] , 'string' , '[/]' );
     
     bp1= uicontrol ( fig , 'style' , 'push' , 'position' , [420 40 60 30 ] ,...
-        'string' , 'Start' , 'callback' , @(bp1,eventdata)TCInterface2(bp1,eventdata,get(choix1,'Value')))
+        'string' , 'Start' , 'callback' , @(bp1,eventdata)GUI_2(bp1,eventdata,get(choix1,'Value')))
     
-    %GasTurbine(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
+    %Gas(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
 end
 
 end
-
