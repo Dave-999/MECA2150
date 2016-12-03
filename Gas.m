@@ -7,9 +7,9 @@ fuel = 'methane';
 eta_piC=0.9;
 eta_piT=0.9;
 k_mec=0.015;
-T3_wished=1050+273.15; %valeur max
+T3=1050+273.15; %valeur max
 k_cc=0.95;
-lambda=1.04; %Exces d'air
+%lambda=1.04; %Exces d'air
 
 if strcmp(fuel,'methane')
     methane=true;
@@ -36,7 +36,7 @@ p4=10^5;
 h1=(x_O2_massic*janaf('h','O2',T1)+(1-x_O2_massic)*janaf('h','N2',T1))*1000 %[J/kg]
 %Trouver T2 et T4
 T2=T1*r^((gamma-1)/gamma/eta_piC)
-%T4=T3*(p3/p4)^(-eta_piT*(gamma-1)/gamma)
+T4=T3*(p3/p4)^(-eta_piT*(gamma-1)/gamma)
 
 m_12=(1-((gamma-1)/gamma/eta_piC))^-1; %Polytropic coefficients
 m_34=(1-((gamma-1)/gamma*eta_piT))^-1;
@@ -44,70 +44,31 @@ m_34=(1-((gamma-1)/gamma*eta_piT))^-1;
 h2=(x_O2_massic*janaf('h','O2',T2)+(1-x_O2_massic)*janaf('h','N2',T2))*1000 %[J/kg]
 
 if methane
-    molar_mass_methane=16.04; %[g/mol]
     LHV_massic=5*10^7; %[J/kg] http://www.engineeringtoolbox.com/fuels-higher-calorific-values-d_169.html
-    LHV_molar=LHV_massic*molar_mass_methane/1000 %[J/mol]
-    x_H2O=2*(18/48)/(1+(2*18/48))
-    m_a1=2*2/x_O2_massic; %CH4 + 2 O2 = CO2 + 2 H2O
+    LHV_molar=LHV_massic*16/1000 %[J/mol]
+    %x_H2O=2*(18/48)/(1+(2*18/48))
+    m_a1=2*2/x_O2_massic %CH4 + 2 O2 = CO2 + 2 H2O
+    lambda=1/2 * (LHV_molar-(janaf('h','CO2',T3)-janaf('h','CO2',T2))*44+2*(janaf('h','H2O',T3)-janaf('h','H2O',T2))*18+2*(janaf('h','O2',T3)-janaf('h','O2',T2))*32) / ((janaf('h','O2',T3)-janaf('h','O2',T2))*32+3.762*(janaf('h','N2',T3)-janaf('h','N2',T2))*28)
     
-    %PAS ENCORE BON
-%     %Obtainment of T3
-%     %Composition of the flue gas if stoechiometric combustion of 1mol of CH4: 1 mol of CO2,
-%     %2 mol of H2O, 7.52381*lambda mol of N2.
-%     m_CO2=44/1000;%[kg]
-%     m_H2O=2*18/1000;
-%     lambda=1; %Initial value
-%     T3=T2;%Initial value
-%     tol_T=10;%[K]
-%     while T3>T3_wished || abs(T3-T3_wished)>tol_T
-%         m_O2=2*32*(lambda-1)/1000;
-%         m_N2=7.523801*14*lambda/1000;
-%         
-%         found_T3_lambda=false%Finding T3 corresponding to lambda
-%         too_little_air=false
-%         tol_LHV=1000
-%         T3_lambda=T3_wished %initial value
-%         m_H2O*(janaf('h','H2O',T3_lambda)-janaf('h','H2O',T2)) + m_CO2*(janaf('h','CO2',T3_lambda)-janaf('h','CO2',T2)) + m_O2*(janaf('h','O2',T3_lambda)-janaf('h','O2',T2)) + m_N2*(janaf('h','N2',T3_lambda)-janaf('h','N2',T2))
-%         while found_T3_lambda==false && too_little_air==false
-%             
-%             LHV_T3_lambda=m_H2O*(janaf('h','H2O',T3_lambda)-janaf('h','H2O',T2)) + m_CO2*(janaf('h','CO2',T3_lambda)-janaf('h','CO2',T2)) + m_O2*(janaf('h','O2',T3_lambda)-janaf('h','O2',T2)) + m_N2*(janaf('h','N2',T3_lambda)-janaf('h','N2',T2))
-%             if abs(LHV_T3_lambda-LHV_molar)<tol_LHV
-%                 T3=T3_lambda
-%                 found_T3_lambda=true
-%             else
-%                 T3_lambda=T3_lambda-1
-%             end
-%             if abs(T3_lambda-T3_wished)>tol_T
-%                 too_little_air=true
-%                 lambda=lambda+0.04
-%             end
-%             
-%         end
-%     end
+    h3=(janaf('h','CO2',T3)*1000/16*44+janaf('h','H2O',T3)*1000/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('h','N2',T3)*1000+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('h','O2',T3)*1000)/(1+lambda*m_a1)
+    h4=(janaf('h','CO2',T4)*1000/16*44+janaf('h','H2O',T4)*1000/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('h','N2',T4)*1000+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('h','O2',T4)*1000)/(1+lambda*m_a1)
+    
     syms ma mc
-    h3=(ma*(1-x_O2_massic)/(ma+mc) * janaf('h','N2',T3)  +  (ma*x_O2_massic+mc)/(ma+mc)*(x_H2O*janaf('h','H2O',T3)+(1-x_H2O)*janaf('h','CO2',T3)))*1000
-    h4=(ma*(1-x_O2_massic)/(ma+mc) * janaf('h','N2',T4)  +  (ma*x_O2_massic+mc)/(ma+mc)*(x_H2O*janaf('h','H2O',T4)+(1-x_H2O)*janaf('h','CO2',T4)))*1000
     [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,...
         P_e == (ma+mc)*(h3-h4)*(1-k_mec)...
-        -  ma*(h2-h1)*(1+k_mec)...
+        -  ma*(h2-h1)*(1+k_mec)... %Eq 3.1
         %mc*LHV== (ma+mc)*h3-ma*h2... %autre équation possible à la place
         %de celle de P_e
-        ],[ma, mc]) %Eq 3.1
+        ],[ma, mc])
     
     m_g=m_a+m_c;
-    
-    h3=(m_a*(1-x_O2_massic)/(m_g) * janaf('h','N2',T3)  +  (m_a*x_O2_massic+m_c)/(m_g)*(x_H2O*janaf('h','H2O',T3)+(1-x_H2O)*janaf('h','CO2',T3)))*1000
-    h4=(m_a*(1-x_O2_massic)/(m_g) * janaf('h','N2',T4)  +  (m_a*x_O2_massic+m_c)/(m_g)*(x_H2O*janaf('h','H2O',T4)+(1-x_H2O)*janaf('h','CO2',T4)))*1000
-    
+    lambda*m_a1*(1-x_O2_massic)/28
+    lambda*m_a1*x_O2_massic/32
+    flue_gas_molar_mass=(16+lambda*m_a1*16)/(1+2+lambda*m_a1*(1-x_O2_massic)*16/28+lambda*m_a1*x_O2_massic*16/32-2)/1000 %[kg/mol]
+    R_g=R/flue_gas_molar_mass
 else
-    LHV=43.4*10^6; %Diesel(gazole) [J/kg]
-    
-    m_a1=(71/4)*(32/167)/x_O2_massic;
-end
-
-if methane
-    
-else
+    LHV_massic=43.4*10^6; %Diesel(gazole) [J/kg]
+    LHV_molar=LHV_massic*167/1000
     m_a1=(71/4)*(32/167)/x_O2_massic; %4 C12H23 + 71 O2 = 48 CO2 + 46 H2O
 end
 
@@ -127,55 +88,58 @@ P_m=P_e+P_fmec;
 %%%%%%%
 
 %T-s
-length_T=100;
-T_12=linspace(T1,T2,length_T);
-T_23=linspace(T2,T3,length_T);
-T_34=linspace(T3,T4,length_T);
-T_41=linspace(T4,T1,length_T);
+length=100;
+T_12=linspace(T1,T2,length);
+T_23=linspace(T2,T3,length);
+T_34=linspace(T3,T4,length);
+T_41=linspace(T4,T1,length);
 
-p_12=zeros(1,length_T);
-p_23=zeros(1,length_T);
-p_34=zeros(1,length_T);
-p_41=10^5;
+p_34=linspace(p3,p4,length);
+p_23=linspace(p2,p3,length);
 
-s_12=zeros(1,length_T);
-s_23=zeros(1,length_T);
-s_34=zeros(1,length_T);
-s_41=zeros(1,length_T);
+s_12=zeros(1,length);
+s_23=zeros(1,length);
+s_34=zeros(1,length);
+s_41=zeros(1,length);
 
-h_12=zeros(1,length_T);
-h_23=zeros(1,length_T);
-h_34=zeros(1,length_T);
-h_41=zeros(1,length_T);
+h_12=zeros(1,length);
+h_23=zeros(1,length);
+h_34=zeros(1,length);
+h_41=zeros(1,length);
 
 
-for i= 1:length_T
-    p_12(i)=(T_12(i)/T1)^(m_12/m_12-1)*p1;
-    %s_12(i)=(x_O2*(janaf('s','O2',T_12(i)+R/32*log(p_12(i)/p1)))+(1-x_O2)*janaf('s','N2',T_12(i)+R/14*log(p_12(i)/p1)));
+for i= 1:length
+    
+    h_12(i)=x_O2_massic*janaf('h','O2',T_12(i))+(1-x_O2_massic)*janaf('h','N2',T_12(i));
+    s_12(i)=x_O2_massic*janaf('s','O2',T_12(i))+(1-x_O2_massic)*janaf('s','N2',T_12(i));
+    
 end
-for i= 1:length_T
-    p_23(i)=p2*i/length_T*k_cc;
-    %s_23(i)=(m_a*(x_O2*(janaf('s','O2',T_23(i)+R/32*log(p_23(i)/p2)))+(1-x_O2)*janaf('s','N2',T_23(i)+R/14*log(p_23(i)/p2))) + m_c*get_methane('s',T_23(i),p_23(i)))/m_g;
+for i= 1:length
+    if methane
+        
+        h_23(i)=(janaf('h','CO2',T_23(i))*1000/16*44+janaf('h','H2O',T_23(i))*1000/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('h','N2',T_23(i))*1000+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('h','O2',T_23(i))*1000)/(1+lambda*m_a1);
+        s_23(i)=(janaf('s','CO2',T_23(i))/16*44+janaf('s','H2O',T_23(i))/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('s','N2',T_23(i))+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('s','O2',T_23(i)))/(1+lambda*m_a1)-R_g*log(p_23(i)/p2);
+    end
 end
-for i= 1:length_T
-    p_34(i)=(T_34(i)/T3)^(m_34/m_34-1)*p3;
-    %s_34(i)=(m_a*(x_O2*(janaf('s','O2',T_34(i)+R/32*log(p_34(i)/p3)))+(1-x_O2)*janaf('s','N2',T_34(i)+R/14*log(p_34(i)/p3))) + m_c*get_methane('s',T_34(i),p_34(i)))/m_g;
+for i= 1:length
+    if methane
+        h_34(i)=(janaf('h','CO2',T_34(i))*1000/16*44+janaf('h','H2O',T_34(i))*1000/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('h','N2',T_34(i))*1000+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('h','O2',T_34(i))*1000)/(1+lambda*m_a1);
+        s_34(i)=(janaf('s','CO2',T_34(i))/16*44+janaf('s','H2O',T_34(i))/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('s','N2',T_34(i))+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('s','O2',T_34(i)))/(1+lambda*m_a1)-R_g*log(p_34(i)/p3);
+    end
 end
-for i= 1:length_T
+for i= 1:length
     %s_41(i)=(m_a*(x_O2*(janaf('s','O2',T_41(i)+R/32*log(p_41/p4)))+(1-x_O2)*janaf('s','N2',T_41(i)+R/14*log(p_41/p4))) + m_c*get_methane('s',T_41(i),p_41))/m_g;
 end
-% plot(s_12,T_12)
-% hold on;
-% plot(s_23,T_23)
-% plot(s_34,T_34)
-% plot(s_41,T_41)
+plot(s_12,h_12)
+hold on;
+plot(s_23,h_23)
+plot(s_34,h_34)
+plot(s_41,h_41)
 
 
 %Energetic efficiency
-m_c*LHV
-m_g*h3-m_a*h2
 %P_m/(m_c*LHV)
-eta_cyclen=P_e/(m_c*LHV)
+eta_cyclen=P_e/(m_c*LHV_massic)
 %eta_cyclen=1-((1+1/(lambda*m_a1))*h4-h1)/((1+1/(lambda*m_a1))*h3-h2)
 eta_mec=P_e/P_m
 eta_toten=eta_cyclen*eta_mec
