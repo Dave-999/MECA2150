@@ -1,5 +1,5 @@
-%function [] = GasTurbine(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
-function [] = Gas()
+%function [] = TG(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
+function [] = TG()
 %A faire varier:
 
 P_e=230*10^6;
