@@ -3,8 +3,8 @@ function [] = Gas()
 %A faire varier:
 
 P_e=230*10^6;
-%fuel = 'diesel'
-fuel = 'methane';
+fuel = 'diesel'
+%fuel = 'methane';
 eta_piC=0.9;
 eta_piT=0.9;
 k_mec=0.015;
@@ -150,8 +150,8 @@ for i= 1:length
         %s_12(i)=s2+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t*(1-eta_piC),T1,T_12(i));
         %s_23(i)=s2+(janaf('s','CO2',T_23(i))/16*44+janaf('s','H2O',T_23(i))/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('s','N2',T_23(i))+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('s','O2',T_23(i)))/(1+lambda*m_a1)-R_g*log(p_23(i)/p2);
     elseif diesel
-        h_23(i)=h2+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T2,T_23(i))*1000;
-        s_23(i)=s2+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T2,T_23(i))-R_g*log(p_23(i)/p2)/1000;
+        h3=h2+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T2,T_23(i))*1000
+        s3=s2+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T2,T_23(i))-R_g*log(p_23(i)/p2)/1000
     end
 end
 
@@ -163,23 +163,20 @@ for i= 1:length
 
         %s_34(i)=(janaf('s','CO2',T_34(i))/16*44+janaf('s','H2O',T_34(i))/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('s','N2',T_34(i))+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('s','O2',T_34(i)))/(1+lambda*m_a1)-R_g*log(p_34(i)/p3);
     elseif diesel
-         h_34(i)=h3+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T3,T_34(i))*1000;
-         s_34(i)=s3-(1-eta_piT)/eta_piT*integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T3,T_34(i));
+         h4=h3+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T3,T4)*1000
+         s4=s3-(1-eta_piT)/eta_piT*integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T3,T4)
     end
 end
 
 %Virtual transformation 4->1
-ds1=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T1)))-s1;
-ds2=(s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,T1))-s1;
+ds=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T_41(i))))-s1;
 for i= 1:length
     if methane
     h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T_41(i))*1000;       
-    s_41(i)=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T_41(i))))-ds1*(i-1)/(length-1);
+    s_41(i)=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T_41(i))))-ds*(i-1)/(length-1);
 
 %s_41(i)=(m_a*(x_O2*(janaf('s','O2',T_41(i)+R/32*log(p_41/p4)))+(1-x_O2)*janaf('s','N2',T_41(i)+R/14*log(p_41/p4))) + m_c*get_methane('s',T_41(i),p_41))/m_g;
-    elseif diesel
-    h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T_41(i))*1000;
-    s_41(i)=s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,T_41(i))-ds2*(i-1)/(length-1);
+    else
     end
     
 end
