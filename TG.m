@@ -3,8 +3,8 @@ function [] = TG()
 %A faire varier:
  
 P_e=230*10^3;%[kW]
-fuel = 'diesel'
-%fuel = 'methane';
+%fuel = 'diesel'
+fuel = 'methane';
 eta_piC=0.9;
 eta_piT=0.9;
 k_mec=0.015;
@@ -60,7 +60,7 @@ s2=s1+(integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c',
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if methane
-    LHV_massic=5*10^4; %[kJ/kg] http://www.engineeringtoolbox.com/fuels-higher-calorific-values-d_169.html
+    LHV_massic=5.0150*10^4; %[kJ/kg] pg66
     LHV_molar=LHV_massic*16/1000 %[kJ/mol]
     %x_H2O=2*(18/48)/(1+(2*18/48))
     m_a1=2*2/x_O2_massic %CH4 + 2 O2 = CO2 + 2 H2O
@@ -85,9 +85,9 @@ if methane
         ],[ma, mc])
     
     m_g=m_a+m_c;
-    ec=52215;
+    ec=52205;
 elseif diesel
-    LHV_massic=43.4*10^3; %Diesel(gazole) [J/kg]
+    LHV_massic=43.4*10^3; %Diesel(gazole) [kJ/kg]
     LHV_molar=LHV_massic*167/1000
     m_a1=(71/4)*(32/167)/x_O2_massic %4 C12H23 + 71 O2 = 48 CO2 + 46 H2O
     lambda=(LHV_massic-(48/4)*(44/(12^2+23))*(janaf('h','CO2',T3)-janaf('h','CO2',T2))-(46/4)*(18/(12^2+23))*(janaf('h','H2O',T3)-janaf('h','H2O',T2))+m_a1*x_O2_massic*(janaf('h','O2',T3)-janaf('h','O2',T2))) / (m_a1*x_O2_massic*(janaf('h','O2',T3)-janaf('h','O2',T2))+m_a1*(1-x_O2_massic)*(janaf('h','N2',T3)-janaf('h','N2',T2)))
@@ -283,7 +283,6 @@ sprintf('Combustion irreversibilities: \n %0.1f MW ',P_irr_comb/1e3)};
 
 
 figure;
-P=[double(P_e) double(P_fmec) double(P_irr_tc) double(P_echap) double(P_irr_comb)];
 pie(P,label);
 title(sprintf('Exergetic flux distribution with Primary Power of  %0.1f  MW',P_prim/1e3 ));
 end
