@@ -4,7 +4,7 @@ function [] = TG()
  
 P_e=230*10^3;%[kW]
 fuel = 'diesel'
-fuel = 'methane';
+%fuel = 'methane';
 eta_piC=0.9;
 eta_piT=0.9;
 k_mec=0.015;
@@ -32,15 +32,17 @@ x_O2_molar=0.21;
 x_O2_massic=x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28) %Fraction massique d'O2 dans l'air =cst
 gamma=1.4;
 r=10;
-T_ref=15+273.15
-T1=50+273.15;
+T1=15+273.15;
+T_ref=T1
 p1=10^5; %[Pa]
 p2=p1*r;
 p3=p2*k_cc;
 p4=p3/k_cc/r;
-h1=(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T_ref)+ integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T1) %[J/kg]
+%h1=(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T_ref) %[kJ/kg]
+h1=0
 %s1=x_O2_massic*janaf('s','O2',T1)+(1-x_O2_massic)*janaf('s','N2',T1) %[]
-s1=integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T_ref,300) + integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,300,T1)
+%s1=integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T_ref,300)
+s1=0
 %Trouver T2 et T4
 T2=T1*r^((gamma-1)/gamma/eta_piC)
 T4=T3*(p3/p4)^(-eta_piT*(gamma-1)/gamma)
@@ -49,8 +51,8 @@ m_12=(1-((gamma-1)/gamma/eta_piC))^-1; %Polytropic coefficients
 m_34=(1-((gamma-1)/gamma*eta_piT))^-1;
  
 %h2=(x_O2_massic*janaf('h','O2',T2)+(1-x_O2_massic)*janaf('h','N2',T2))*1000 %[J/kg]
-h2=h1+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),T1,T2)%(other way to get the same result)
-s2=s1+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,T1,T2)*(1-eta_piC)
+h2=h1+(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T1)+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T2)%(other way to get the same result)
+s2=s1+(integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,300)+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,300,T2))*(1-eta_piC)
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Calculation of lambda, of the enthalpy and entropy at states 3 & 4%
@@ -138,9 +140,10 @@ eta_toten=eta_cyclen*eta_mec
 %Exergy calculations%
 %%%%%%%%%%%%%%%%%%%%%
 
-h0=(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-(15+273.15)) %[J/kg]
-s0=integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T_ref,300)
-
+%h0=(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-(15+273.15)) %[J/kg]
+h0=0
+%s0=integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T_ref,300)
+s0=0
 e1=h1-h0-T_ref*(s1-s0)
 e2=h2-h0-T_ref*(s2-s0)
 e3=h3-h0-T_ref*(s3-s0)
@@ -177,11 +180,17 @@ h_34=zeros(1,length);
 h_41=zeros(1,length);
  
 %In the compressor:
+h_300=(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T1)
+s_300=integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,300) 
 for i= 1:length
+    if T_12(i)<300
+        h_12(i)=h1+(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(T_12(i)-T1);
+        s_12(i)=s1+integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,T_12(i)) 
+    else
+        h_12(i)=h1+h_300+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T_12(i));
+    s_12(i)=s1+(1-eta_piC)*(s_300+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,300,T_12(i)));
+    end
     
-    h_12(i)=h1+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),T1,T_12(i));
-    
-    s_12(i)=s1+(1-eta_piC)*integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,T1,T_12(i));
     %s_12(i)=x_O2_massic*janaf('s','O2',T_12(i))+(1-x_O2_massic)*janaf('s','N2',T_12(i))-s1;
     
 end
@@ -215,24 +224,32 @@ for i= 1:length
 end
  
 %Virtual transformation 4->1
-ds1=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T1)))-s1;%Correction terms for CH4
-dh1=h1-(h4+integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T1));
+ds1=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,300))+(integral(@(t) (janaf('c','CO2',300)/16*44+janaf('c','H2O',300)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))./t/(1+lambda*m_a1),300,T1)))-s1%Correction terms for CH4
+dh1=h1-(h4+integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,300)+(janaf('c','CO2',300)/16*44+janaf('c','H2O',300)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)*(T1-300))
 
-ds2=(s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,T1))-s1; %Correction terms for C12H23
-dh2=h1-(h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T1));
+ds2=(s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,300)+(integral(@(t) (janaf('c','CO2',300)*44/(12^2+23)*48/4+janaf('c','H2O',300)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)./t,300,T1)))-s1; %Correction terms for C12H23
+dh2=h1-(h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,300)+(janaf('c','CO2',300)*44/(12^2+23)*48/4+janaf('c','H2O',300)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)*(T1-300));
 
 
 for i= 1:length
     if methane
+        if T_41(i)<300
+           h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,300)+(janaf('c','CO2',300)/16*44+janaf('c','H2O',300)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)*(T_41(i)-300) +dh1*(i-1)/(length-1);       
+    s_41(i)=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,300))+(integral(@(t) (janaf('c','CO2',300)/16*44+janaf('c','H2O',300)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))./t/(1+lambda*m_a1),300,T_41(i))))-ds1*(i-1)/(length-1); 
+        else
     h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T_41(i)) +dh1*(i-1)/(length-1);       
     s_41(i)=(s4+(integral(@(t) (janaf('c','CO2',t)/16*44+janaf('c','H2O',t)/8*18+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))./t/(1+lambda*m_a1),T4,T_41(i))))-ds1*(i-1)/(length-1);
- 
+        end
 %s_41(i)=(m_a*(x_O2*(janaf('s','O2',T_41(i)+R/32*log(p_41/p4)))+(1-x_O2)*janaf('s','N2',T_41(i)+R/14*log(p_41/p4))) + m_c*get_methane('s',T_41(i),p_41))/m_g;
     elseif diesel
-    h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T_41(i))+dh2*(i-1)/(length-1);
-    s_41(i)=s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,T_41(i))-ds2*(i-1)/(length-1);
+        if T_41(i)<300
+            h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,300)+ (janaf('c','CO2',300)*44/(12^2+23)*48/4+janaf('c','H2O',300)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)*(T_41(i)-300) +dh2*(i-1)/(length-1);
+    s_41(i)=s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,300)+ integral(@(t) (janaf('c','CO2',300)*44/(12^2+23)*48/4+janaf('c','H2O',300)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',300)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',300))/(1+lambda*m_a1)./t,300,T_41(i))-ds2*(i-1)/(length-1);
+        else
+    h_41(i)=h4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1),T4,T_41(i)) +dh2*(i-1)/(length-1);
+    s_41(i)=s4+integral(@(t) (janaf('c','CO2',t)*44/(12^2+23)*48/4+janaf('c','H2O',t)*18/(12^2+23)*46/4+lambda*m_a1*(1-x_O2_massic)*janaf('c','N2',t)+(lambda*m_a1*x_O2_massic-m_a1*x_O2_massic)*janaf('c','O2',t))/(1+lambda*m_a1)./t,T4,T_41(i)) -ds2*(i-1)/(length-1);
+        end
     end
-    
 end
  figure
  plot(s_12,h_12)
