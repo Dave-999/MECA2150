@@ -278,5 +278,18 @@ label={sprintf('Effective power \n %0.1f MW ',P_e/1e3)...
 figure;
 pie(P,label);
 title(sprintf('Exergetic flux distribution with Primary Power of  %0.1f  MW',P_prim/1e3 ));
+<<<<<<< HEAD
+=======
+
+p=[p1;p2;p3;p4];
+T=[T1;T2;T3;T4];
+h=[h1;h2;h3;h4];
+s=[s1;s2;s3;s4];
+Etats={'1';'2';'3';'4'};
+
+Table = table(p,T,h,s,'RowNames',Etats)
+
+
+>>>>>>> origin/master
 
 end
