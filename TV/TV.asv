@@ -46,7 +46,7 @@ end
 etat3 = struct;
 etat3.p = p3;
 etat3.T = T3;
-etat3.x = NaN;
+etat3.x = -1;
 etat3.h = XSteam('h_pt',etat3.p,etat3.T); %[kJ/kg]
 etat3.s = XSteam('s_pt',etat3.p,etat3.T); %[kJ/kg.°C]
 
