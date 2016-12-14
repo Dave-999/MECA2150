@@ -278,7 +278,5 @@ label={sprintf('Effective power \n %0.1f MW ',P_e/1e3)...
 figure;
 pie(P,label);
 title(sprintf('Exergetic flux distribution with Primary Power of  %0.1f  MW',P_prim/1e3 ));
+
 end
-
-
-
