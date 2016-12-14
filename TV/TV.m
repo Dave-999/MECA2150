@@ -18,6 +18,11 @@ eta_mec = 0.98;
 x_O2_molar = 0.21;
 x_O2_massic = x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28)
 
+%Exergy ref
+h0=XSteam('h_pt',1,15)
+s0=XSteam('s_pt',1,15)
+T0=15
+
 if strcmp(fuel,'methane')
     methane=true;
     diesel=false;
@@ -49,6 +54,7 @@ etat3.T = T3;
 etat3.x = NaN;
 etat3.h = XSteam('h_pt',etat3.p,etat3.T); %[kJ/kg]
 etat3.s = XSteam('s_pt',etat3.p,etat3.T); %[kJ/kg.°C]
+etat3.e = etat3.h-h0-(T0+273.15)*(etat3.s-s0)
 
 %etat 4
 etat4 = struct;
@@ -58,6 +64,8 @@ etat4.T = T4;
 etat4.x = x4;
 etat4.h = h4;
 etat4.s = s4;
+etat4.e = etat4.h-h0-(T0+273.15)*(etat4.s-s0)
+
 
 %etat 1
 etat1 = struct;
@@ -66,6 +74,8 @@ etat1.T = etat4.T; %car isobare
 etat1.x = 0; %etat 1 sur la courbe x=0
 etat1.h = XSteam('h_px',etat1.p,etat1.x);
 etat1.s = XSteam('s_ph',etat1.p,etat1.h);
+etat1.e = etat1.h-h0-(T0+273.15)*(etat1.s-s0)
+
 
 %etat 2
 etat2.p = etat3.p; %apport de chaleur isobare
@@ -74,6 +84,9 @@ etat2.T = T2;
 etat2.x = NaN;
 etat2.h = h2;
 etat2.s= s2;
+etat2.e = h2-h0-(T0+273.15)*(etat2.s-s0)
+
+
 
 %%%%%%%%%%%%%%%%%%%%
 %Power calculations%
@@ -128,8 +141,27 @@ T=[etat1.T;etat2.T;etat3.T;etat4.T];
 x=[etat1.x;etat2.x;etat3.x;etat4.x];
 h=[etat1.h;etat2.h;etat3.h;etat4.h];
 s=[etat1.s;etat2.s;etat3.s;etat4.s];
+e=[etat1.e;etat2.e;etat3.e;etat4.e];
 Etats={'1';'2';'3';'4'};
 
-Table = table(p,T,x,h,s,'RowNames',Etats)
+Table = table(p,T,x,h,s,e,'RowNames',Etats)
+
+% Graphes T-s et h-s
+
+% length=10;
+% T_12=linspace(T1,T2,length);
+% T_23=linspace(T2,T3,length);
+% T_34=linspace(T3,T4,length);
+% T_41=linspace(T4,T1,length);
+% 
+% s_12=zeros(1,length);
+% s_23=zeros(1,length);
+% s_34=zeros(1,length);
+% s_41=zeros(1,length);
+% 
+% h_12=zeros(1,length);
+% h_23=zeros(1,length);
+% h_34=zeros(1,length);
+% h_41=zeros(1,length);
 
 end
