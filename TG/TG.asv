@@ -250,9 +250,7 @@ text(s1,h1,'\leftarrowEtat 1')
 text(s2,h2,'\leftarrowEtat 2')
 text(s3,h3,'\leftarrowEtat 3')
 text(s4,h4,'\leftarrowEtat 4')
-title('Graphe h-s')
-xlabel('Entropie [J/kgK]')
-ylabel('Enthalpie [kJ/kg]')
+title(
 
 figure
 plot(s_12,T_12,'blue')
@@ -264,9 +262,7 @@ text(s1,T1,'\leftarrowEtat 1')
 text(s2,T2,'\leftarrowEtat 2')
 text(s3,T3,'\leftarrowEtat 3')
 text(s4,T4,'\leftarrowEtat 4')
-title('Graphe T-s')
-xlabel('Entropie [J/kgK]')
-ylabel('Température [K]')
+
 %%%%%%%%%%%%%%%
 %Tableau des résulats%
 %%%%%%%%%%%%%%%
