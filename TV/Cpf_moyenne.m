@@ -1,8 +1,8 @@
-function Cpf = Cpf_logm(Ti, Tf, frac_CO2, frac_H2O, frac_O2, frac_N2)
-% Fumees en sortie de cheminee
-% Renvoie la capacite calorifique moyenne ("barre horizontale",formule p.32)
+function Cpf = Cpf_moyenne(Ti, Tf, frac_CO2, frac_H2O, frac_O2, frac_N2)
+% Fumees
+% Renvoie la capacite calorifique moyenne (formule p.32)
 %
-% Arguments :
+% INPUT
 % T0 : borne min d'integration [°C]
 % Tf : borne max d'integration [°C]
 % frac_CO2 : fraction massique de CO2 dans les fumees

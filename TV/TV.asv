@@ -27,8 +27,8 @@ end
 % Donnees %
 %%%%%%%%%%%
 
-t3 = 525; %[°C]
-p3 = 40; %[bar] (200)
+t3 = 525; %[°C] (525)
+p3 = 200; %[bar] (200)
 t_c = 15; %[°C]
 t4 = t_c + deltaT; %[°C]
 
@@ -56,7 +56,7 @@ e3 = (h3-h0) - (t0+273.15)*(s3-s0);
 %etat 4
 p4 = XSteam('psat_T',t4); %[bar]
 [x4,h4,s4] = Etat_detente(h3,s3,p4,eta_si_T);
-e4 = (h4-h0) - (t0+273.15)*(s4-s0)
+e4 = (h4-h0) - (t0+273.15)*(s4-s0);
 
 %etat 1
 p1 = p4; %refroidissement isobare
@@ -100,17 +100,17 @@ m_a = lambda*m_a1*m_c
 
 P_prim_en = m_c*PCI_massique;
 p_gen = P_prim_en*(1-eta_gen);
-p_cyclen = (P_prim_en-p_gen)*(1-eta_cyclen);
-p_mec_en = (P_prim_en-p_gen-p_cyclen)*(1-eta_mec);
+p_cyclen = m_v*(h3-h2)*(1-eta_cyclen);
+p_mec_en = m_v*((h3-h4)-(h2-h1))*(1-eta_mec);
 
-data_en = [P_e p_mec_en p_cyclen p_gen];
+data_en = [P_e p_gen p_cyclen p_mec_en];
 
 %Point de vue exergetique
 
 [m_f, e_f, e_ech, e_r] = Fumee(PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, lambda, t_ech, m_c, dT_prechauf);
 
-eta_cyclex = ((e3-e4)-(e2-e1))/(e3-e2)
 eta_rotex = ((h3-h4)-(h2-h1))/((e3-e4)-(e2-e1))
+eta_cyclex = eta_rotex*((e3-e4)-(e2-e1))/(e3-e2)
 
 eta_combex = m_f*(e_f - e_r)/(m_c*e_c)
 eta_chemex = m_f*(e_f - e_ech)/(m_f*(e_f - e_r))
@@ -120,14 +120,14 @@ eta_gex = eta_combex*eta_chemex*eta_transex
 eta_totex = eta_gex*eta_cyclex*eta_mec
 
 P_prim_ex = m_c*e_c;
-p_combex = P_prim_ex*(1-eta_combex);
-p_chemex = (P_prim_ex-p_combex)*(1-eta_chemex);
-p_transex = (P_prim_ex-p_combex-p_chemex)*(1-eta_transex);
-p_cyclex = (P_prim_ex-p_combex-p_chemex-p_transex)*(1-eta_cyclex); %definition du livre p.68
-p_rotex = (P_prim_ex-p_combex-p_chemex-p_transex-p_cyclex)*(1-eta_rotex);
-p_mec_ex = (P_prim_ex-p_combex-p_chemex-p_transex-p_cyclex-p_rotex)*(1-eta_mec);
+p_combex = m_c*e_c*(1-eta_combex);
+p_chemex = m_f*(e_f - e_r)*(1-eta_chemex);
+p_transex = m_f*(e_f - e_ech)*(1-eta_transex);
+p_cyclex = (e3-e2)*(1-eta_cyclex);
+p_rotex = ((e3-e4)-(e2-e1))*(1-eta_rotex);
+p_mec_ex = m_v*((e3-e4)-(e2-e1))*(1-eta_mec);
 
-data_ex = [P_e p_mec_ex p_rotex p_cyclex p_transex p_chemex p_combex];
+data_ex = [P_e p_combex p_chemex p_transex p_cyclex p_rotex p_mec_ex];
 
 %%
 
@@ -152,10 +152,10 @@ Table = table(p,t,x,h,s,e,'RowNames',Etats)
 
 %energetique
 label_en = {sprintf('Puissance effective \n %1.1f MW ',data_en(1)/1e3)...
-            sprintf('Pertes mécaniques \n %1.1f MW ',data_en(2)/1e3)...
-            sprintf('Pertes au condenseur \n %1.1f MW ',data_en(3)/1e3)...
-            sprintf('Pertes au générateur de vapeur \n %1.1f MW ',data_en(4)/1e3)};
-   
+         sprintf('Pertes au générateur de vapeur \n %1.1f MW ',data_en(2)/1e3)...
+         sprintf('Pertes au condenseur \n %1.1f MW ',data_en(3)/1e3)...
+         sprintf('Pertes mécaniques \n %1.1f MW ',data_en(4)/1e3)};
+
 figure;
 pie(data_en,label_en);
 titre = title(sprintf('Flux énergétique primaire %1.1f MW',P_prim_en/1e3));
@@ -163,16 +163,16 @@ pos = get(titre,'position');
 set(titre,'position',pos+[0 0.08 0]);
 
 %exergetique
-label_ex = {sprintf('Puissance effective \n %1.1f MW ',data_ex(1)/1e3)...
-         sprintf('Pertes mécaniques \n %1.1f MW ',data_ex(2)/1e3)...
-         sprintf('Irréversibilités à la turbine et aux pompes \n %1.1f MW ',data_ex(3)/1e3)...
-         sprintf('Pertes au condenseur \n %1.1f MW ',data_ex(4)/1e3)...
-         sprintf('Irréversibilités du transfert de chaleur au générateur de vapeur \n %1.1f MW ',data_ex(5)/1e3)...
-         sprintf('Pertes à la cheminée \n %1.1f MW ',data_ex(6)/1e3)...
-         sprintf('Irréversibilités de la combustion \n %1.1f MW ',data_ex(7)/1e3)};
-         
+label_ex = {sprintf('Puissance effective \n %1.1f MW ',data(1)/1e3)...
+         sprintf('Irréversibilités de la combustion \n %1.1f MW ',data(2)/1e3)...
+         sprintf('Pertes à la cheminée \n %1.1f MW ',data(3)/1e3)...
+         sprintf('Irréversibilités du transfert de chaleur au générateur de vapeur \n %1.1f MW ',data(4)/1e3)...
+         sprintf('Pertes au condenseur \n %1.1f MW ',data(5)/1e3)...
+         sprintf('Irréversibilités à la turbine et aux pompes \n %1.1f MW ',data(6)/1e3)...  
+         sprintf('Pertes mécaniques \n %1.1f MW ',data(7)/1e3)};
+
 figure;
-pie(data_ex,label_ex);
+pie(data_en,label_ex);
 titre = title(sprintf('Flux énergétique primaire %1.1f MW',P_prim_ex/1e3));
 pos = get(titre,'position');
 set(titre,'position',pos+[0 0.08 0]);

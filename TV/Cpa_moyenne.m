@@ -1,8 +1,8 @@
-function Cpa = Cpa_logm(Ti, Tf, frac_O2, frac_N2)
+function Cpa = Cpa_moyenne(Ti, Tf, frac_O2, frac_N2)
 % Air ambiant
-% Renvoie la capacite calorifique moyenne ("barre horizontale",formule p.32)
+% Renvoie la capacite calorifique moyenne (formule p.32)
 %
-% Arguments :
+% INPUT
 % T0 : borne min d'integration [°C]
 % Tf : borne max d'integration [°C]
 % frac_O2 : fraction massique de O2 dans les fumees
