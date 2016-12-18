@@ -1,5 +1,5 @@
 %function [] = TG(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
-function [W_m] = TG(r,T3)
+function A = TG(r,T3)
 %A faire varier:
 
 P_e=230*10^3;%[kW]
@@ -117,34 +117,35 @@ P_mC=m_a*W_mC;
 
 W_m=(1+1/m_a1/lambda)*W_mT-W_mC;
 
-% P_fmec=k_mec*(P_mT+P_mC);%=P_e-P_m
-% P_m=P_e+P_fmec;
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%
-% %Rendements énergétiques%
-% %%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% eta_cyclen=P_e/(m_c*LHV_massic);
-% eta_mec=P_e/P_m;
-% eta_toten=eta_cyclen*eta_mec;
-% 
-% 
+P_fmec=k_mec*(P_mT+P_mC);%=P_e-P_m
+P_m=P_e+P_fmec;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%Rendements énergétiques%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+eta_cyclen=P_e/(m_c*LHV_massic);
+eta_mec=P_e/P_m;
+eta_toten=eta_cyclen*eta_mec;
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%
 % %Rendements exergétiques%
 % %%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% h0=0;
-% s0=0;
-% e1=h1-h0-T_ref*(s1-s0);
-% e2=h2-h0-T_ref*(s2-s0);
-% e3=h3-h0-T_ref*(s3-s0);
-% e4=h4-h0-T_ref*(s4-s0);
-% 
-% eta_totex=P_e/(m_c*ec);
-% eta_rotex=(m_g*(h3-h4)-m_a*(h2-h1))/(m_g*(e3-e4)-m_a*(e2-e1));
-% eta_cyclex=(m_g*(e3-e4)-m_a*(e2-e1))/(m_g*e3-m_a*e2);
-% eta_combex=(m_g*e3-m_a*e2)/(m_c*ec);
-% 
+
+h0=0;
+s0=0;
+e1=h1-h0-T_ref*(s1-s0);
+e2=h2-h0-T_ref*(s2-s0);
+e3=h3-h0-T_ref*(s3-s0);
+e4=h4-h0-T_ref*(s4-s0);
+
+eta_totex=P_e/(m_c*ec);
+eta_rotex=(m_g*(h3-h4)-m_a*(h2-h1))/(m_g*(e3-e4)-m_a*(e2-e1));
+eta_cyclex=(m_g*(e3-e4)-m_a*(e2-e1))/(m_g*e3-m_a*e2);
+eta_combex=(m_g*e3-m_a*e2)/(m_c*ec);
+
+A=[W_m eta_cyclen eta_toten eta_cyclex eta_totex]
+
 % %%%%%%%
 % %Plots%
 % %%%%%%%%%%%
