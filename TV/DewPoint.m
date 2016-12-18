@@ -1,5 +1,5 @@
 function [T] = DewPoint(p)
-%Renvoie le point de rosée[°C] pour une pression partielle de vapeur d'eau
+%Renvoie le point de rosee [°C] pour une pression partielle de vapeur d'eau
 %https://en.wikipedia.org/wiki/Dew_point
 
 a = 6.112;

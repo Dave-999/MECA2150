@@ -28,7 +28,7 @@ end
 %%%%%%%%%%%
 
 t3 = 525; %[°C]
-p3 = 40; %[bar] (200)
+p3 = 200; %[bar] (200)
 t_c = 15; %[°C]
 t4 = t_c + deltaT; %[°C]
 
@@ -56,7 +56,7 @@ e3 = (h3-h0) - (t0+273.15)*(s3-s0);
 %etat 4
 p4 = XSteam('psat_T',t4); %[bar]
 [x4,h4,s4] = Etat_detente(h3,s3,p4,eta_si_T);
-e4 = (h4-h0) - (t0+273.15)*(s4-s0)
+e4 = (h4-h0) - (t0+273.15)*(s4-s0);
 
 %etat 1
 p1 = p4; %refroidissement isobare
