@@ -1,8 +1,9 @@
+%TG(230,'CH4',0.9,0.9,0.015,1050,0.95,10)
 function A = TG(P_e, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, r)
 %A faire varier:
 
 if nargin ==0
-P_e=230*10^3;%[kW]
+P_e=230;%[MW]
 fuel = 'CH4';
 eta_piC=0.9;
 eta_piT=0.9;
@@ -16,7 +17,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%
 %Propriétés invariantes%
 %%%%%%%%%%%%%%%%%%%%%%%%
-
+P_e=P_e*10^3 %[kW]
 T3=T3+273.15 %[K]
 R=8.314472;
 R_a=287.1;
@@ -104,8 +105,8 @@ eta_toten=eta_cyclen*eta_mec;
 %Rendements exergétiques%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
-h0=0;
-s0=0;
+h0=h1;
+s0=s1;
 e1=h1-h0-T_ref*(s1-s0);
 e2=h2-h0-T_ref*(s2-s0);
 e3=h3-h0-T_ref*(s3-s0);
