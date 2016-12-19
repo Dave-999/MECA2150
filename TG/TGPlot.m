@@ -191,7 +191,7 @@ plot(r(j1Wm),MaximumsWm(1),'o','MarkerSize',10)
 legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 title('Travail moteur selon T3 et r')
 xlabel('r [/]')
-ylabel('W_m [kJ/kg]')
+ylabel('Wm [kJ/kg]')
 
 figure
 
@@ -206,7 +206,7 @@ legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 
 title('Rendement énergétique du cycle selon T3 et r')
 xlabel('r [/]')
-ylabel('eta_{cyclen} [/]')
+ylabel('eta_cyclen')
 
 figure
 plot(r,TGetatoten)
@@ -220,7 +220,7 @@ legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 
 title('Rendement énergétique total selon T3 et r')
 xlabel('r [/]')
-ylabel('eta_{toten} [/]')
+ylabel('eta_toten')
 
 figure
 plot(r,TGetacyclex)
@@ -234,7 +234,7 @@ legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 
 title('Rendement exergétique du cycle selon T3 et r')
 xlabel('r [/]')
-ylabel('eta_{cyclex} [/]')
+ylabel('eta_cyclex')
 
 figure
 plot(r,TGetatotex)
@@ -248,7 +248,7 @@ legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 
 title('Rendement exergétique total selon T3 et r')
 xlabel('r [/]')
-ylabel('eta_{toten} [/]')
+ylabel('eta_toten')
 
 
 figure
@@ -259,8 +259,8 @@ plot(TGWm(3,:),TGetacyclen(3,:));
 plot(TGWm(4,:),TGetacyclen(4,:));
 legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 title('Rendement énergétique du cycle selon le travail moteur')
-xlabel('W_m [kJ/Kg]')
-ylabel('eta_{cyclen} [/]')
+xlabel('Wm [kJ/Kg]')
+ylabel('eta_cyclen')
 r_max_Wm=[r(j1Wm) r(j2Wm) r(j3Wm) r(j4Wm)]
 r_max_etacyclen=[r(j1etacyclen) r(j2etacyclen) r(j3etacyclen) r(j4etacyclen)]
 

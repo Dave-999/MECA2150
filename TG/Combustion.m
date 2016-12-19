@@ -111,10 +111,10 @@ a4 = y/2;
 a5 = (lambda-1)*a1;
 a6 = lambda*a2;
 
-n_CO2=a3;
-n_H2O=a4;
-n_O2=a5;
-n_N2=a6;
+n_CO2=a3
+n_H2O=a4
+n_O2=a5
+n_N2=a6
 
 %Pouvoir comburivore massique (pour 1kg de combustible)
 m_a1 = 1/M*a1*M_O2/x_massique_O2;
