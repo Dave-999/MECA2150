@@ -191,7 +191,7 @@ plot(r(j1Wm),MaximumsWm(1),'o','MarkerSize',10)
 legend('t3=1000°C','t3=1200°C','t3=1400°C','t3=1600°C')
 title('Travail moteur selon T3 et r')
 xlabel('r [/]')
-ylabel('W_m [kJ/kg]')
+ylabel('Wm [kJ/kg]')
 
 figure
 
