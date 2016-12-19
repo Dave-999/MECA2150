@@ -1,6 +1,9 @@
 %TG(230,'CH4',0.9,0.9,0.015,1050,0.95,10)
 function A = TG(P_e, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, r)
-%A faire varier:
+
+%%%%%%%%%%%%
+%Parametres%
+%%%%%%%%%%%%
 
 if nargin ==0
 P_e=230;%[MW]
@@ -12,17 +15,17 @@ T3=1050; %[°C] valeur max
 k_cc=0.95;
 r=10;
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %Propriétés invariantes%
 %%%%%%%%%%%%%%%%%%%%%%%%
+
 P_e=P_e*10^3 %[kW]
 T3=T3+273.15 %[K]
 R=8.314472;
 R_a=287.1;
 x_O2_molar=0.21;
-x_O2_massic=x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28); %Fraction massique d'O2 dans l'air =cst
+x_O2_massic=x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28); %Fraction massique d'O2 dans l'air = cst
 gamma=1.4;
 T1=15+273.15;
 T_ref=0+273.15; %T de référence pour h, s et e
@@ -46,10 +49,9 @@ T2= fzero(@(T2) TG_fT2(p1,p2,T1,T2,eta_piT,x_O2_massic,R_a),700); %pg 120
 h2=h1+(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T1)+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T2);%(other way to get the same result)
 s2=s1+(integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,300)+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,300,T2))*(1-eta_piC)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Calculs du lambda, des états 3 et 4%
-%et des débits massiques            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Calculs du lambda, des etats 3 et 4 et des debits massiques%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 syms l
 [PCI_massique, ec, m_a1,fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, n_CO2, n_H2O, n_O2, n_N2,M] = Combustion(fuel,l);
@@ -71,12 +73,12 @@ s4=s3-(1-eta_piT)/eta_piT*integral(@(t) (janaf('c','CO2',t)*frac_CO2+janaf('c','
 
 %Débits%
     syms ma mc
-    [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,... eq 3.7
+    [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,... %Eq 3.7
         P_e == (ma+mc)*(h3-h4)*(1-k_mec)... 
         -  ma*(h2-h1)*(1+k_mec)... %Eq 3.1
         ],[ma, mc]);
     
-    m_g=m_a+m_c;
+    m_g = m_a + m_c;
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %Calculs de puissances%
@@ -124,7 +126,9 @@ A=[W_m eta_cyclen eta_toten eta_cyclex eta_totex];
 %%%%%%%%%%%
 %T-s & H-s%
 %%%%%%%%%%%
-length=10;
+
+length = 10;
+
 T_12=linspace(T1,T2,length);
 T_23=linspace(T2,T3,length);
 T_34=linspace(T3,T4,length);
@@ -180,8 +184,8 @@ for i= 1:length
             s_41(i)=s4+integral(@(t) (janaf('c','CO2',t)*frac_CO2+janaf('c','H2O',t)*frac_H2O+janaf('c','N2',t)*frac_N2+janaf('c','O2',t)*frac_O2)./t,T4,T_41(i))-ds*(i-1)/(length-1);
         end
         %s_41(i)=(m_a*(x_O2*(janaf('s','O2',T_41(i)+R/32*log(p_41/p4)))+(1-x_O2)*janaf('s','N2',T_41(i)+R/14*log(p_41/p4))) + m_c*get_methane('s',T_41(i),p_41))/m_g;
-    
 end
+
 figure
 plot(s_12,h_12,'blue')
 hold on;
@@ -209,9 +213,10 @@ text(s4,T4,'\leftarrowEtat 4')
 title('Graphe T-s')
 xlabel('Entropie [J/kgK]')
 ylabel('Température [K]')
-%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
 %Tableau des résulats%
-%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
 
 p=[p1;p2;p3;p4];
 T=[T1;T2;T3;T4];
@@ -239,6 +244,7 @@ pie(P,label);
 title(sprintf('Distribution du flux énergétique avec puissance primaire de %0.1f  MW',P_prim_en/1e3 ));
 
 %Exergetique%
+
 P_prim_ex=ec*m_c;
 P_irr_comb = P_prim_ex*(1-eta_combex);
 P_echap = (e4-e1)*m_g;
