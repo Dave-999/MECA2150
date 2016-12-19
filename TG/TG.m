@@ -300,30 +300,41 @@ text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,800,300,40] ,...
     'string' , 'Caractéristiques des états' , 'fontsize' , 15 )
 t1 = uitable(fig1);
 t1.Data = table2cell(Table);
-t1.Position = [120 680 419 108];
+t1.Position = [120 695 419 108];
 t1.ColumnName = {'p [kPa]','T [K]','h [kJ/kg]','s[kJ/kgK]','e[kJ/kg]'};
 
 %Rendements$
-text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,590,300,40] ,...
+text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,630,300,40] ,...
     'string' , 'Rendements' , 'fontsize' , 15 )
 ETAt=[double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_rotex); double(eta_cyclex); double(eta_combex); double(eta_totex)]
 ETA=table(ETAt,'RowNames',{'eta_cyclen'; 'eta_mec'; 'eta_toten'; 'eta_rotex'; 'eta_cyclex'; 'eta_combex'; 'eta_totex'})
 t2 = uitable(fig1);
 t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t2.Position = [240 420 200 160];
+t2.Position = [240 470 200 160];
 t2.RowName = {'eta_cyclen','eta_mec','eta_toten','eta_rotex','eta_cyclex','eta_combex','eta_totex'};
 t2.ColumnName= {''}
 
 %Puissances$
-text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,330,300,40] ,...
-    'string' , 'Puissances' , 'fontsize' , 15 )
-PUISSANCEt=[double(P_mT); double(P_mC); double(P_fmec); double(P_prim_en); double(P_echap_en); double(P_prim_ex); double(P_irr_comb);double(P_echap_ex);double(P_irr_tc)]
+text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [70,400,300,40] ,...
+    'string' , 'Puissances [MW]' , 'fontsize' , 15 )
+PUISSANCEt=[double(P_mT); double(P_mC); double(P_fmec); double(P_prim_en); double(P_echap_en); double(P_prim_ex); double(P_irr_comb);double(P_echap_ex);double(P_irr_tc)]/1000
 PUISSANCE=table(PUISSANCEt,'RowNames',{'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'})
 t3 = uitable(fig1);
 t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t3.Position = [240 125 205 195];
+t3.Position = [110 195 205 195];
 t3.RowName = {'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'};
 t3.ColumnName= {''}
+
+%Débits$
+text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [330,400,300,40] ,...
+    'string' , 'Débits [kg/s]' , 'fontsize' , 15 )
+DEBITSt=[double(m_a); double(m_c)]
+DEBITS=table(DEBITSt,'RowNames',{'Air'; 'Carburant'})
+t4 = uitable(fig1);
+t4.Data = table2cell(DEBITS)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+t4.Position = [380 320 190 70];
+t4.RowName = {'Air'; 'Carburant'};
+t4.ColumnName= {''}
 
 %Boutons%
 bp1 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [100 50 200 30 ] ,...
