@@ -24,7 +24,7 @@ T3=T3+273.15; %[K]
 R=8.314472;
 R_a=287.1;
 x_O2_molar=0.21;
-x_O2_massic=x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28); %Fraction massique d'O2 dans l'air =cst
+x_O2_massic=x_O2_molar*32/(x_O2_molar*32+(1-x_O2_molar)*28); %Fraction massique d'O2 dans l'air = cst
 gamma=1.4;
 T1=15+273.15;
 T_ref=0+273.15; %T de référence pour h, s et e
