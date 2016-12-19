@@ -1,4 +1,5 @@
 function [] = TGPlot()
+
 T3=1000;
 length=100;
 r=linspace(2,100,length);
@@ -264,7 +265,4 @@ ylabel('eta_{cyclen} [/]')
 r_max_Wm=[r(j1Wm) r(j2Wm) r(j3Wm) r(j4Wm)]
 r_max_etacyclen=[r(j1etacyclen) r(j2etacyclen) r(j3etacyclen) r(j4etacyclen)]
 
-
-
 end
-

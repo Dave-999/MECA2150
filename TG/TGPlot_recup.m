@@ -79,7 +79,7 @@ while TGeta_cyclen(5,j5)<Maximums(5)
    j5=j5+1;
 end
 
-figure
+figure;
 
 plot(r,TGeta_cyclen)
 hold on
@@ -95,4 +95,3 @@ xlabel('r [/]')
 ylabel('eta_{cyclen} [/]')
 
 end
-

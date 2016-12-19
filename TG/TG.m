@@ -5,7 +5,7 @@ function A = TG(P_e, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, r)
 %Parametres%
 %%%%%%%%%%%%
 
-if nargin ==0
+if nargin == 0
 P_e=230;%[MW]
 fuel = 'CH4';
 eta_piC=0.9;

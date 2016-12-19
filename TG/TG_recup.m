@@ -1,7 +1,10 @@
 function eta_cyclen = TG_recup(P_e, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, r,NTU)
-%A faire varier:
 
-if nargin ==0
+%%%%%%%%%%%%
+%Parametres%
+%%%%%%%%%%%%
+
+if nargin == 0
 P_e=230*10^3;%[kW]
 fuel = 'CH4';
 eta_piC=0.9;
@@ -12,7 +15,6 @@ k_cc=0.95;
 r=10;
 NTU=4
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %Propriétés invariantes%
@@ -46,10 +48,9 @@ T2= fzero(@(T2) TG_fT2(p1,p2,T1,T2,eta_piT,x_O2_massic,R_a),700); %pg 120
 h2=h1+(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T1)+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T2);%(other way to get the same result)
 s2=s1+(integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,300)+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,300,T2))*(1-eta_piC);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Calculs du lambda, des états 3 et 4%
-%et des débits massiques            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Calculs du lambda, des etats 3 et 4 et des debits massiques%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 syms l
 [PCI_massique, ec, m_a1,fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, n_CO2, n_H2O, n_O2, n_N2,M] = Combustion(fuel,l);
@@ -74,7 +75,7 @@ s4=s3-(1-eta_piT)/eta_piT*integral(@(t) (janaf('c','CO2',t)*frac_CO2+janaf('c','
 
 %Débits%
     syms ma mc
-    [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,... eq 3.7
+    [m_a, m_c] = vpasolve([lambda*m_a1 == ma/mc,... %Eq 3.7
         P_e == (ma+mc)*(h3-h4)*(1-k_mec)... 
         -  ma*(h2-h1)*(1+k_mec)... %Eq 3.1
         ],[ma, mc]);
