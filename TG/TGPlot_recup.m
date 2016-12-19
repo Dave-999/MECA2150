@@ -90,7 +90,7 @@ plot(r(j2),Maximums(2),'o','MarkerSize',10)
 plot(r(j1),Maximums(1),'o','MarkerSize',10)
 
 legend('NTU=0','NTU=1','NTU=2','NTU=4','NTU=8')
-title('Rendemdent énergétique du cycle selon r et le NTU')
+title('Rendement énergétique du cycle selon r et NTU')
 xlabel('r [/]')
 ylabel('eta_{cyclen} [/]')
 
