@@ -14,7 +14,7 @@ Maximumsetacyclex=zeros(1,4);
 TGetatotex=zeros(4,length);
 Maximumsetatotex=zeros(1,4);
 for i=1:length
-    A=TG(r(i),T3);
+    A=TG(230,1,0.9,0.9,0.015,T3,0.95,r(i));
     TGWm(1,i)=A(1);
     TGetacyclen(1,i)=A(2);
     TGetatoten(1,i)=A(3);
@@ -57,7 +57,7 @@ end
 
 T3=1200;
 for i=1:length
-     A=TG(r(i),T3);
+     A=TG(230,1,0.9,0.9,0.015,T3,0.95,r(i));
      TGWm(2,i)=A(1,1);
      TGetacyclen(2,i)=A(1,2);
     TGetatoten(2,i)=A(3);
@@ -99,7 +99,7 @@ end
 
 T3=1400;
 for i=1:length
-     A=TG(r(i),T3);
+     A=TG(230,1,0.9,0.9,0.015,T3,0.95,r(i));
      TGWm(3,i)=A(1,1);
      TGetacyclen(3,i)=A(1,2);
      TGetatoten(3,i)=A(1,3);
@@ -139,7 +139,7 @@ end
 
 T3=1600;
 for i=1:length
-     A=TG(r(i),T3);
+     A=TG(230,1,0.9,0.9,0.015,T3,0.95,r(i));
      TGWm(4,i)=A(1,1)
      TGetacyclen(4,i)=A(1,2);
      TGetatoten(4,i)=A(1,3);
