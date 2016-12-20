@@ -10,7 +10,7 @@ function [] = TV()
 if nargin  == 0
     
     P_e = 35*10^3; %puissance effective [kW]
-    dT_cond = 10; %ecart entre T4 et la riviere
+    dT = 10; %ecart entre T4 et la riviere
     eta_siT = 0.88; %rendement isentropique turbine
     eta_siC = 0.88; %rendement isentropique pompe
     eta_mec = 0.98; %rendement mecanique
@@ -24,7 +24,7 @@ if nargin  == 0
     t3 = 525; %temperature maximale en sortie de chaudiere [°C]
     p3 = 200; %pression de vapeur vive en sortie de chaudiere [bar]
     t_sf = 15; %temperature source froide (riviere) [°C]
-    t4 = t_sf + dT_cond; %temperature en sortie de turbine [°C]
+    t4 = t_sf + deltaT; %temperature en sortie de turbine [°C]
 
 end
 

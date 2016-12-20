@@ -22,7 +22,7 @@ e_ech = Enthalpie_Fumee(t0, t_ech, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2)...
 e_a = fracR_O2*Enthalpie(t0, t_c, 'O2') + fracR_N2*Enthalpie(t0, t_c, 'N2')...
       -(t0+273.15)*(fracR_O2*Entropie(t0, t_c, 'O2') + fracR_N2*Entropie(t0, t_c, 'N2'));
   
-e_cr = Cp*(t_c - t0) - (t0+273.15)*Cp*log((t_c+273.15)/(t0+273.15));
+e_cr = Cp*(t_c-t0) - (t0+273.15)*Cp*log((t_c+273.15)/(t0+273.15));
   
 e_r = e_a*lambda*m_a1/(lambda*m_a1 + 1) + e_cr/(lambda*m_a1 + 1); %exergie des reactifs, = 0 si pas de de prechauffe
   

@@ -1,4 +1,4 @@
-function [x4,h4,s4] = Etat_detente(h3,s3,p4,eta)
+function [x4,h4,s4] = Detente(h3,s3,p4,eta)
 %calcule l'etat en sortie de detente
 %s3 = s4s
 %eta = rendement isentropique
