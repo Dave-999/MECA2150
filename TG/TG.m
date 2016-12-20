@@ -221,7 +221,7 @@ end
 
 fig1=figure('units','normalized','outerposition',[0 0 1 1]);
 
-text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [600,740,300,40] ,...
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [175,880,300,40] ,...
     'string' , 'Résulats' , 'fontsize' , 30 )
 
 subplot ( 'Position' , [ .40 .6 .2 .3 ] ) ;
@@ -305,7 +305,7 @@ text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,680,300,40] ,...
     'string' , 'Caractéristiques des états' , 'fontsize' , 15 )
 t1 = uitable(fig1);
 t1.Data = table2cell(Table);
-t1.Position = [140 565 338 108];
+t1.Position = [110 565 425 108];
 t1.ColumnName = {'p [kPa]','T [°C]','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
 
 %Rendements$
@@ -341,12 +341,13 @@ t4.Position = [315 240 190 70];
 t4.RowName = {'Air'; 'Carburant'};
 t4.ColumnName= {''}
 
+%Point de rosée%
 text5 = uicontrol( fig1 , 'style' , 'text' , 'position' , [320,180,200,40] ,...
     'string' , 'Temp. de rosée [°C]' , 'fontsize' , 15 )
 ROSEE=table(T_rosee,'RowNames',{'T_rosee'})
 t5 = uitable(fig1);
-t5.Data = table2cell(ROSEE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t5.Position = [335 140 150 48];
+t5.Data = table2cell(ROSEE);
+t5.Position = [335 120 165 58];
 t5.RowName = {'T_rosee'};
 t5.ColumnName= {''}
 
