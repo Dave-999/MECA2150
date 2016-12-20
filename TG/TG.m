@@ -301,7 +301,7 @@ text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,800,300,40] ,...
 t1 = uitable(fig1);
 t1.Data = table2cell(Table);
 t1.Position = [120 695 419 108];
-t1.ColumnName = {'p [kPa]','T [K]','h [kJ/kg]','s[kJ/kgK]','e[kJ/kg]'};
+t1.ColumnName = {'p [kPa]','T [°C]','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
 
 %Rendements$
 text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,630,300,40] ,...
