@@ -18,7 +18,7 @@ end
 %%%%%%%%%%%%%
 
 if cycle == 2
-    fig = figure('color',[0.7 0.5 0.3],'name','Interface de la simulation de turbine à gaz')
+    fig = figure('name','Interface de la simulation de turbine à gaz')
       
     text1 = uicontrol( fig , 'style' , 'text' , 'position' , [200,350,170,30] ,...
         'string' , 'Turbine à gaz' , 'fontsize' , 15 )
@@ -37,7 +37,7 @@ if cycle == 2
     ui5 = uicontrol ( fig , 'style' , ' text' , 'position', [10,185,150,45] , 'string' , 'Coefficient de perfection aérodynamique de la combustion (k_cc)' );
     unit5 = uicontrol ( fig , 'style' , ' text' , 'position', [230,200,30,15] , 'string' , '[/]' );
     
-    text6 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,200,50,15] , 'Max' , 1 , 'string' , '1150' )
+    text6 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,200,50,15] , 'Max' , 1 , 'string' , '1050' )
     ui6 = uicontrol ( fig , 'style' , ' text' , 'position', [280,192,150,30] , 'string' , 'Temperature de sortie de combustion (doit être =< 1150)' )
     unit6 = uicontrol ( fig , 'style' , ' text' , 'position', [500,200,30,15] , 'string' , '[C]' )
     

@@ -1,4 +1,4 @@
-%TG(230,'CH4',0.9,0.9,0.015,1050,0.95,10)
+%TG(230,1,0.9,0.9,0.015,1050,0.95,10)
 function A = TG(P_e, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r)
 close all
 %%%%%%%%%%%%
@@ -16,7 +16,6 @@ k_cc=0.95;
 r=10;
 end
 if fuel_number == 1
-    disp('Hello')
 fuel='CH4'
 elseif fuel_number ==2
 fuel='C12H23'
@@ -73,16 +72,22 @@ T2= fzero(@(T2) TG_fT2(p1,p2,T1,T2,eta_piT,x_O2_massic,R_a),700); %pg 120
 h2=h1+(x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))*(300-T1)+integral(@(t) x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t),300,T2);%(other way to get the same result)
 s2=s1+(integral(@(t) (x_O2_massic*janaf('c','O2',300)+(1-x_O2_massic)*janaf('c','N2',300))./t,T1,300)+integral(@(t) (x_O2_massic*janaf('c','O2',t)+(1-x_O2_massic)*janaf('c','N2',t))./t,300,T2))*(1-eta_piC)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Calculs du lambda, des etats 3 et 4 et des debits massiques%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Calculs du lambda, de T_rosee, et des etats 3 et 4 et des debits massiques%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%lambda%
 syms l
-[PCI_massique, ec, m_a1,fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, n_CO2, n_H2O, n_O2, n_N2,M] = Combustion(fuel,l);
+[PCI_massique, ec, m_a1,fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, n_CO2, n_H2O, n_O2, n_N2,M, p_part_H2O] = TGCombustion(fuel,l);
 
 lambda=solve(@(l) PCI_massique==(fracP_CO2*(janaf('h','CO2',T3)-janaf('h','CO2',T2))+fracP_H2O*(janaf('h','H2O',T3)-janaf('h','H2O',T2))+fracP_O2*(janaf('h','O2',T3)-janaf('h','O2',T2))+fracP_N2*(janaf('h','N2',T3)-janaf('h','N2',T2)))*(1+m_a1*l),l);
 lambda=double(lambda);
-[PCI_massique, ec, m_a1,frac_CO2, frac_H2O, frac_O2, frac_N2, n_CO2, n_H2O, n_O2, n_N2,M] = Combustion(fuel,lambda);
+[PCI_massique, ec, m_a1,frac_CO2, frac_H2O, frac_O2, frac_N2, n_CO2, n_H2O, n_O2, n_N2,M, p_part_H2O] = TGCombustion(fuel,lambda);
+
+%T_rosee%
+T_rosee=DewPoint(p_part_H2O)
+
+%T4%
 flue_gas_molar_mass=(M+M*m_a1*lambda)/(n_CO2+ n_H2O+ n_O2+ n_N2)/1000;
 R_g=R/flue_gas_molar_mass;
 T4= fzero(@(T4) TG_fT4(p3,p4,T3,T4,eta_piT,x_O2_massic,R_g,lambda,m_a1,frac_CO2,frac_H2O,frac_O2,frac_N2),700); %pg 121
@@ -183,7 +188,7 @@ for i= 1:length
     end
 end
 
-%Combustion:
+%TGCombustion:
 for i= 1:length
     h_23(i)=h2+integral(@(t) janaf('c','CO2',t)*frac_CO2+janaf('c','H2O',t)*frac_H2O+janaf('c','N2',t)*frac_N2+janaf('c','O2',t)*frac_O2,T2,T_23(i));
 s_23(i)=s2+integral(@(t) (janaf('c','CO2',t)*frac_CO2+janaf('c','H2O',t)*frac_H2O+janaf('c','N2',t)*frac_N2+janaf('c','O2',t)*frac_O2)./t,T2,T_23(i))-R_g*log(p_23(i)/p2)/1000;
@@ -214,12 +219,12 @@ end
 %Affichage%
 %%%%%%%%%%%
 
-fig1=figure('Position', [0, 50, 1900, 900]);
+fig1=figure('units','normalized','outerposition',[0 0 1 1]);
 
-text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [750,870,300,40] ,...
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [600,740,300,40] ,...
     'string' , 'Résulats' , 'fontsize' , 30 )
 
-subplot ( 'Position' , [ .38 .6 .2 .3 ] ) ;
+subplot ( 'Position' , [ .40 .6 .2 .3 ] ) ;
 plot(s_12,h_12,'blue')
 hold on;
 plot(s_23,h_23,'blue')
@@ -232,7 +237,7 @@ text(s4,h4,'\leftarrowEtat 4')
 title('Graphe h-s')
 xlabel('Entropie [J/kgK]')
 ylabel('Enthalpie [kJ/kg]')
-subplot ( 'Position' , [ .38 .1 .2 .3 ] ) ;
+subplot ( 'Position' , [ .40 .13 .2 .3 ] ) ;
 
 plot(s_12,T_12,'blue')
 hold on;
@@ -260,7 +265,7 @@ P=[double(P_e) double(P_fmec) double(P_echap_en)];
 label={sprintf('Puissance effective \n %0.1f MW ',P_e/1e3)...
     sprintf('Pertes mécaniques \n %0.1f MW ',P_fmec/1e3)...
     sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_en/1e3)};
-subplot ( 'Position' , [ .61 .52 .3 .45 ] ) ;
+subplot ( 'Position' , [ .66 .48 .3 .45 ] ) ;
 pie(P,label);
 title(sprintf('Distribution du flux énergétique avec puissance primaire de %0.1f  MW',P_prim_en/1e3 ));
 
@@ -278,13 +283,13 @@ label={sprintf('Puissance effective \n %0.1f MW ',P_e/1e3)...
     sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_ex/1e3)...
     sprintf('Irréversibilités de la combustion: \n %0.1f MW ',P_irr_comb/1e3)};
 
-subplot ( 'Position' , [ .61 0.02 .3 .45 ] ) ;
+subplot ( 'Position' , [ .66 0.02 .3 .45 ] ) ;
 pie(P,label);
 title(sprintf('Distribution du flux exergétique avec puissance primaire de %0.1f  MW',P_prim_ex/1e3 ));
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %Tableaux des résulats%
-%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%9%
 %Caractéristiques des états$
 p=[p1;p2;p3;p4]./1000;
 T=[T1;T2;T3;T4]-273.15;
@@ -296,51 +301,60 @@ Etats={'1';'2';'3';'4'};
 Table = table(p,T,h,s,e,'RowNames',Etats)
 
 
-text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,800,300,40] ,...
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,680,300,40] ,...
     'string' , 'Caractéristiques des états' , 'fontsize' , 15 )
 t1 = uitable(fig1);
 t1.Data = table2cell(Table);
-t1.Position = [120 695 419 108];
+t1.Position = [140 565 338 108];
 t1.ColumnName = {'p [kPa]','T [°C]','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
 
 %Rendements$
-text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [200,630,300,40] ,...
+text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,515,300,40] ,...
     'string' , 'Rendements' , 'fontsize' , 15 )
 ETAt=[double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_rotex); double(eta_cyclex); double(eta_combex); double(eta_totex)]
 ETA=table(ETAt,'RowNames',{'eta_cyclen'; 'eta_mec'; 'eta_toten'; 'eta_rotex'; 'eta_cyclex'; 'eta_combex'; 'eta_totex'})
 t2 = uitable(fig1);
 t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t2.Position = [240 470 200 160];
+t2.Position = [210 355 200 160];
 t2.RowName = {'eta_cyclen','eta_mec','eta_toten','eta_rotex','eta_cyclex','eta_combex','eta_totex'};
 t2.ColumnName= {''}
 
 %Puissances$
-text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [70,400,300,40] ,...
+text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [40,310,300,40] ,...
     'string' , 'Puissances [MW]' , 'fontsize' , 15 )
 PUISSANCEt=[double(P_mT); double(P_mC); double(P_fmec); double(P_prim_en); double(P_echap_en); double(P_prim_ex); double(P_irr_comb);double(P_echap_ex);double(P_irr_tc)]/1000
 PUISSANCE=table(PUISSANCEt,'RowNames',{'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'})
 t3 = uitable(fig1);
 t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t3.Position = [110 195 205 195];
+t3.Position = [80 115 205 195];
 t3.RowName = {'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'};
 t3.ColumnName= {''}
 
 %Débits$
-text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [330,400,300,40] ,...
+text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [270,310,300,40] ,...
     'string' , 'Débits [kg/s]' , 'fontsize' , 15 )
 DEBITSt=[double(m_a); double(m_c)]
 DEBITS=table(DEBITSt,'RowNames',{'Air'; 'Carburant'})
 t4 = uitable(fig1);
 t4.Data = table2cell(DEBITS)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t4.Position = [380 320 190 70];
+t4.Position = [315 240 190 70];
 t4.RowName = {'Air'; 'Carburant'};
 t4.ColumnName= {''}
 
+text5 = uicontrol( fig1 , 'style' , 'text' , 'position' , [320,180,200,40] ,...
+    'string' , 'Temp. de rosée [°C]' , 'fontsize' , 15 )
+ROSEE=table(T_rosee,'RowNames',{'T_rosee'})
+t5 = uitable(fig1);
+t5.Data = table2cell(ROSEE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+t5.Position = [335 140 150 48];
+t5.RowName = {'T_rosee'};
+t5.ColumnName= {''}
+
 %Boutons%
-bp1 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [100 50 200 30 ] ,...
+bp1 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [70 50 200 30 ] ,...
     'string' , 'Nouvelle Turbine à gaz' , 'callback' , @(bp1,eventdata)GUI_2(2))
 
-bp2 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [350 50 200 30 ] ,...
+bp2 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [300 50 200 30 ] ,...
     'string' , 'Retour au menu principal' , 'callback' , @(bp2,eventdata)GUI())
 
 end

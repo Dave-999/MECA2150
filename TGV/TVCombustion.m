@@ -1,4 +1,4 @@
-function [PCI_massique, e_c, m_a1, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, n_CO2, n_H2O, n_O2, n_N2, M] = Combustion(fuel,lambda)
+function [PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2] = Combustion(fuel,lambda)
 % Reaction de combustion pour differents combustibles
 
 % INPUT
@@ -110,11 +110,6 @@ a3 = z;
 a4 = y/2;
 a5 = (lambda-1)*a1;
 a6 = lambda*a2;
-
-n_CO2=a3;
-n_H2O=a4;
-n_O2=a5;
-n_N2=a6;
 
 %Pouvoir comburivore massique (pour 1kg de combustible)
 m_a1 = 1/M*a1*M_O2/x_massique_O2;
