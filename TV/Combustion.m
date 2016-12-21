@@ -116,7 +116,7 @@ m_a1 = 1/M*a1*M_O2/x_massique_O2;
 
 %Fractions massiques des reactifs
 m_reactifs = 1*M + lambda*a1*M_O2 + lambda*a2*M_N2;
-fracR_c = 1*M/m_reactifs;
+fracR_c = 1*M/m_reactifs; %fraction massique de combustible
 fracR_O2 = lambda*a1*M_O2/m_reactifs;
 fracR_N2 = lambda*a2*M_N2/m_reactifs;
 
