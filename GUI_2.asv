@@ -5,11 +5,109 @@ close all
 %%%%%%%%%%%%%%%%
 
 if cycle==1
-    fig = figure('color',[0.2 0.5 0.8],'name','Steam power plant simulator initerface')
-    text3 = uicontrol( fig , 'style' , 'text' , 'position' , [170,300,230,30] ,...
-        'string' , 'Steam power plant' , 'fontsize' , 15 )
-    text4 = uicontrol( fig , 'style' , 'text' , 'position' , [50,200,500,30] ,...
-        'string' , 'Please set the parameters value' , 'fontsize' , 15 )
+    fig = figure('units','normalized','outerposition',[0.33 0.2 0.33 0.8],'name','Interface de la simulation de turbine à vapeur')
+    text1 = uicontrol( fig , 'style' , 'text' , 'position' , [125,670,340,30] ,...
+        'string' , 'Turbine à vapeur' , 'fontsize' , 15 )
+    text2 = uicontrol( fig , 'style' , 'text' , 'position' , [50,620,500,30] ,...
+        'string' , 'Veuillez donner une valeur aux  paramètres' , 'fontsize' , 15 )
+    
+    text2bis = uicontrol( fig , 'style' , 'text' , 'position' , [35,150,500,30] ,...
+        'string' , 'Tour de refroidissement' , 'fontsize' , 10 )
+    
+    text3 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,540,50,15] , 'Max' , 1 , 'string' , '288' );
+    ui3 = uicontrol ( fig , 'style' , ' text' , 'position', [10,540,150,15] , 'string' , 'Puissance effective' );
+    unit3 = uicontrol ( fig , 'style' , ' text' , 'position', [230,540,30,15] , 'string' , '[MW]' );
+    
+    text4 = uicontrol ( gcf , 'Style' , 'popup' , 'String' , 'CH4|C12H23|C|CH1.8|C3H8|H2|CO' , 'Position' , [440 542 100 15] )
+    ui4 = uicontrol ( fig , 'style' , ' text' , 'position', [280, 538 ,150,15] , 'string' , 'Carburant' )
+
+    text5 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,500,50,15] , 'Max' , 1 , 'string' , '8');
+    ui5 = uicontrol ( fig , 'style' , ' text' , 'position', [10,475,150,45] , 'string' , 'Nombre de soutirages' );
+    unit5 = uicontrol ( fig , 'style' , ' text' , 'position', [230,500,30,15] , 'string' , '[/]' );
+    
+    text6 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,500,50,15] , 'Max' , 1 , 'string' , '1' )
+    ui6 = uicontrol ( fig , 'style' , ' text' , 'position', [280,492,150,30] , 'string' , 'Nombre de resurchauffes (0 ou 1)' )
+    unit6 = uicontrol ( fig , 'style' , ' text' , 'position', [500,500,30,15] , 'string' , '[/]' )
+    
+    text7 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,447,50,20] , 'Max' , 1 , 'string' , '0.88' );
+    ui7 = uicontrol ( fig , 'style' , ' text' , 'position', [10,442,150,30] , 'string' , 'Rendement isentropique des turbines(eta_siT)' );
+    unit7 = uicontrol ( fig , 'style' , ' text' , 'position', [230,450,30,15] , 'string' , '[/]' );
+    
+    text8 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,447,50,20] , 'Max' , 1 , 'string' , '0.88' );
+    ui8 = uicontrol ( fig , 'style' , ' text' , 'position', [280,442 ,150,30] , 'string' , 'Rendement isentropique de la pompe (eta_siP)' );
+    unit8 = uicontrol ( fig , 'style' , ' text' , 'position', [500,450,30,15] , 'string' , '[/]' );
+    
+    text9 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,408,50,15] , 'Max' , 1 , 'string' , '0.98' );
+    ui9 = uicontrol ( fig , 'style' , ' text' , 'position', [10,400,150,30] , 'string' , 'Rendement mécanique (eta_mec)' );
+    unit9 = uicontrol ( fig , 'style' , ' text' , 'position', [230,408,30,15] , 'string' , '[/]' );
+    
+    text10 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,408,50,15] , 'Max' , 1 , 'string' , '1.05' );
+    ui10 = uicontrol ( fig , 'style' , ' text' , 'position', [280,400,150,30] , 'string' , 'Excès d''air (lambda)' )
+    unit10 = uicontrol ( fig , 'style' , ' text' , 'position', [500,408,30,15] , 'string' , '[/]' );
+    
+    
+    
+    
+    
+    
+    text11 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,368,50,15] , 'Max' , 1 , 'string' , '525' );
+    ui11 = uicontrol ( fig , 'style' , ' text' , 'position', [10,360,150,30] , 'string' , 'Température de vapeur après le générateur de vapeur (t3)' );
+    unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [230,368,30,15] , 'string' , '[°C]' );
+    
+    text12 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,368,50,15] , 'Max' , 1 , 'string' , '200' );
+    ui12 = uicontrol ( fig , 'style' , ' text' , 'position', [280,360,150,30] , 'string' , 'Pression de vapeur après le générateur de vapeur (p3)');
+unit12 = uicontrol ( fig , 'style' , ' text' , 'position', [500,368,30,15] , 'string' , '[bar]' );
+
+    text13 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,328,50,15] , 'Max' , 1 , 'string' , '0.15');
+    ui13 = uicontrol ( fig , 'style' , ' text' , 'position', [10,300,150,45] , 'string' , 'Rapport de détente dans le corps HP' );
+    unit13 = uicontrol ( fig , 'style' , ' text' , 'position', [230,328,30,15] , 'string' , '[/]' );
+    
+    text14= uicontrol ( fig , 'style' , ' edit' , 'position', [440,328,50,15] , 'Max' , 1 , 'string' , '15' )
+    ui14 = uicontrol ( fig , 'style' , ' text' , 'position', [280,320,150,30] , 'string' , 'Température de la source froide (rivière) (t_sf)' )
+    unit14 = uicontrol ( fig , 'style' , ' text' , 'position', [500,328,30,15] , 'string' , '[°C]' )
+    
+    text15 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,288,50,20] , 'Max' , 1 , 'string' , '10' );
+    ui15 = uicontrol ( fig , 'style' , ' text' , 'position', [10,282,150,30] , 'string' , 'Ecart de température entre le condenseur et la rivière (dT_cond)' );
+    unit15 = uicontrol ( fig , 'style' , ' text' , 'position', [230,300,30,15] , 'string' , '[/]' );
+    
+    text16 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,288,50,20] , 'Max' , 1 , 'string' , '120' );
+    ui16 = uicontrol ( fig , 'style' , ' text' , 'position', [280,278 ,150,30] , 'string' , 'Température des fumées à l''échappement' );
+    unit16 = uicontrol ( fig , 'style' , ' text' , 'position', [500,290,30,15] , 'string' , '[°C]' );
+    
+    text17 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,248,50,15] , 'Max' , 1 , 'string' , '15' );
+    ui17 = uicontrol ( fig , 'style' , ' text' , 'position', [10,240,150,30] , 'string' , 'Température de l''air ambiant' );
+    unit17 = uicontrol ( fig , 'style' , ' text' , 'position', [230,248,30,15] , 'string' , '[°C]' );
+    
+    text18 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,248,50,15] , 'Max' , 1 , 'string' , '0.01' );
+    ui18 = uicontrol ( fig , 'style' , ' text' , 'position', [280,240,150,30] , 'string' , 'Pertes par déperditions calorifiques (en fraction du PCI)' )
+    unit18 = uicontrol ( fig , 'style' , ' text' , 'position', [500,248,30,15] , 'string' , '[%]' );
+    
+    text19 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,208,50,15] , 'Max' , 1 , 'string' , '0' );
+    ui19 = uicontrol ( fig , 'style' , ' text' , 'position', [10,190,150,30] , 'string' , 'Préchauffe du combustible et de l''air (dT_prechauf)' )
+    unit19 = uicontrol ( fig , 'style' , ' text' , 'position', [230,208,30,15] , 'string' , '[°C]' );
+    
+    text20 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,128,50,15] , 'Max' , 1 , 'string' , '25');
+    ui20 = uicontrol ( fig , 'style' , ' text' , 'position', [10,120,150,45] , 'string' , 'Température de l''eau de refroidissement après le condenseur' );
+    unit20 = uicontrol ( fig , 'style' , ' text' , 'position', [230,128,30,15] , 'string' , '[°C]' );
+    
+    text21= uicontrol ( fig , 'style' , ' edit' , 'position', [440,128,50,15] , 'Max' , 1 , 'string' , '15' )
+    ui21 = uicontrol ( fig , 'style' , ' text' , 'position', [280,116,150,30] , 'string' , 'Température de l''air à l''entrée de la tour' )
+    unit21 = uicontrol ( fig , 'style' , ' text' , 'position', [500,128,30,15] , 'string' , '[°C]' )
+    
+    text22 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,88,50,20] , 'Max' , 1 , 'string' , '0.8' );
+    ui22 = uicontrol ( fig , 'style' , ' text' , 'position', [10,82,150,30] , 'string' , 'Température de l''air à la sortie de la tour' );
+    unit22 = uicontrol ( fig , 'style' , ' text' , 'position', [230,88,30,15] , 'string' , '[°C]' );
+    
+    text23 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,88,50,20] , 'Max' , 1 , 'string' , '1' );
+    ui23 = uicontrol ( fig , 'style' , ' text' , 'position', [280,78 ,150,30] , 'string' , 'Humidité relative de l''air à l''entrée de la tourHumidité relative de l''air à la sortie de la tour' );
+    unit23 = uicontrol ( fig , 'style' , ' text' , 'position', [500,90,30,15] , 'string' , '[/]' );
+    
+    text24 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,48,50,20] , 'Max' , 1 , 'string' , '0.8' );
+    ui24= uicontrol ( fig , 'style' , ' text' , 'position', [10,42,150,30] , 'string' ,  'Humidité relative de l''air à la sortie de la tour' );
+    unit24 = uicontrol ( fig , 'style' , ' text' , 'position', [230,48,30,15] , 'string' , '[/]' );
+    
+bp1 = uicontrol ( fig , 'style' , 'push' , 'position' , [420 50 60 30 ] ,...
+        'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TV(str2double(get(text3,'String'))*1000,get(text4,'Value'), str2double(get(text5,'String')), str2double(get(text6,'String')), str2double(get(text11,'String')), str2double(get(text12,'String')), str2double(get(text13,'String')), str2double(get(text14,'String')), str2double(get(text15,'String')), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text10,'String')), str2double(get(text16,'String')), str2double(get(text17,'String')), str2double(get(text18,'String')), str2double(get(text19,'String')),  str2double(get(text20,'String')),  str2double(get(text21,'String')),  str2double(get(text22,'String')),  str2double(get(text23,'String')),str2double(get(text24,'String'))))
 end
 
 
@@ -60,10 +158,11 @@ if cycle == 2
     
     bp1 = uicontrol ( fig , 'style' , 'push' , 'position' , [420 50 60 30 ] ,...
         'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TG(str2double(get(text3,'String')), get(text4,'Value'), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text6,'String')), str2double(get(text5,'String')), str2double(get(text10,'String'))))
-    
-    %TG(power, fuel, eta_piC, eta_piT, k_mec, T3, k_cc, lambda)
 end
 
+%%%%%
+%TGV%
+%%%%%
 if cycle == 3
     fig = figure('units','normalized','outerposition',[0.33 0.2 0.33 0.8],'name','Interface de la simulation de turbine à gaz')
   
@@ -116,15 +215,15 @@ if cycle == 3
     
     
     text11 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,300,50,15] , 'Max' , 1 , 'string' , '5.8' );
-    ui11 = uicontrol ( fig , 'style' , ' text' , 'position', [10,300,150,15] , 'string' , 'Pression de vapeur à HP (p3)' );
+    ui11 = uicontrol ( fig , 'style' , ' text' , 'position', [10,300,150,15] , 'string' , 'Pression de vapeur à BP (p2)' );
     unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [230,300,30,15] , 'string' , '[bar]' );
     
     text12 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,300,50,15] , 'Max' , 1 , 'string' , '78' );
-    ui12 = uicontrol ( fig , 'style' , ' text' , 'position', [280,300,150,15] , 'string' , 'Pression de vapeur HP (p2)');
-unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [500,300,30,15] , 'string' , '[bar]' );
+    ui12 = uicontrol ( fig , 'style' , ' text' , 'position', [280,300,150,15] , 'string' , 'Pression de vapeur HP (p3)');
+unit12 = uicontrol ( fig , 'style' , ' text' , 'position', [500,300,30,15] , 'string' , '[bar]' );
 
     text13 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,260,50,15] , 'Max' , 1 , 'string' , '0.9');
-    ui513 = uicontrol ( fig , 'style' , ' text' , 'position', [10,245,150,45] , 'string' , 'Rendement isentropique des turbines (eta_isT)' );
+    ui13 = uicontrol ( fig , 'style' , ' text' , 'position', [10,245,150,45] , 'string' , 'Rendement isentropique des turbines (eta_isT)' );
     unit13 = uicontrol ( fig , 'style' , ' text' , 'position', [230,260,30,15] , 'string' , '[/]' );
     
     text14= uicontrol ( fig , 'style' , ' edit' , 'position', [440,260,50,15] , 'Max' , 1 , 'string' , '0.9' )
@@ -156,7 +255,5 @@ unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [500,300,30,15] , 'st
     unit20 = uicontrol ( fig , 'style' , ' text' , 'position', [500,126,30,15] , 'string' , '[°C]' );
     
     bp1 = uicontrol ( fig , 'style' , 'push' , 'position' , [420 50 60 30 ] ,...
-        'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TGV(str2double(get(text3,'String')), get(text4,'Value'), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text6,'String')), str2double(get(text5,'String')), str2double(get(text10,'String')), stre2double(get(text14,'String')), stre2double(get(text13,'String')),stre2double(get(text15,'String'))))
-    %TGV(TGP_e, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_isP, eta_isT, eta_mec, p2, p3, delta_Ta, t_cond, pinch_cond, pinch_HP, pinch_BP)
-
+        'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TGV(str2double(get(text3,'String')), get(text4,'Value'), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text6,'String')), str2double(get(text5,'String')), str2double(get(text10,'String')), str2double(get(text14,'String')), str2double(get(text13,'String')),str2double(get(text15,'String')),str2double(get(text11,'String')),str2double(get(text12,'String')),str2double(get(text16,'String')),str2double(get(text17,'String')),str2double(get(text18,'String')),str2double(get(text19,'String')),str2double(get(text20,'String'))))
 end

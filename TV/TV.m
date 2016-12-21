@@ -1,4 +1,5 @@
-function [] = TV()
+function [] = TV(P_e, fuel_number, n_souti, n_resurch, t3, p3, rapport_HP, t_sf, dT_cond, eta_siT, eta_siP, eta_mec, lambda, t_ech, t_a, p_calo, dT_prechauf, phi_air_in, t_air_in)
+
 %Turbine a vapeur - main function
 
 %%
@@ -11,20 +12,19 @@ if nargin  == 0
     
     P_e = 288*10^3; %puissance effective  /!\ [kW] /!\
     
-    n_souti = 8; %nombre de resurchauffe
-    n_resurch = 1; %nombre de soutirage
+    n_souti = 8; %nombre de soutirage
+    n_resurch = 1; %nombre de resurchauffe 
     
-    t3 = 525; %temperature de vapeur vive apres le geenrateur de vapeur [°C]
-    p3 = 200; %pression de vapeur vive apres le geenrateur de vapeur [bar]
+    t3 = 525; %temperature de vapeur vive apres le generateur de vapeur [°C]
+    p3 = 200; %pression de vapeur vive apres le generateur de vapeur [bar]
     rapport_HP = 0.15; %rapport de détente dans le corps HP 
     t_sf = 15; %temperature source froide (riviere) [°C]
     dT_cond = 10; %ecart de temperature entre le condenseur et la riviere
-    t6 = t_sf + dT_cond; %temperature a l'entree du condenseur [°C]
     eta_siT = 0.88; %rendement isentropique turbine
     eta_siP = 0.88; %rendement isentropique pompe
     eta_mec = 0.98; %rendement mecanique
     lambda = 1.05; %coefficient d'exces d'air
-    fuel = 'CH4'; %combustible
+    fuel_number = 1; %combustible
     t_ech = 120; %temperature des fumees a l'echappement [°C]
     p_calo = 0.01; %perte par déperditions calorifiques = 1% du PCI
     dT_prechauf = 0; %prechauffe du combustible et du comburant
@@ -32,20 +32,31 @@ if nargin  == 0
     %tour de refroidissement
     t_air_in = 15; %temperature de l'air a l'entree de la tour
     phi_air_in = 0.8; %humidite relative de l'air a l'entree de la tour
-    
-    
+   
 end
 
+t6 = t_sf + dT_cond; %temperature a l'entree du condenseur [°C]
 t_a = 15; %temperature de l'air ambiant [°C]
-
 t_sf_out = t6; %temperature de l'eau de refroidissement après le condenseur
 p_air = 1; %pression de l'air de la tour [bar]
 t_air_out = t_sf_out; %temperature de l'air a la sortie de la tour
 phi_air_out = 1; %humidite relative de l'air a la sortie de la tour
 
-%Limites en fin de détente : on doit verifier ?
-p_ech_min = 0.04; 
-x_ech_min = 0.88;
+if fuel_number == 1
+fuel='CH4'
+elseif fuel_number ==2
+fuel='C12H23'
+elseif fuel_number == 3
+fuel='C'
+elseif fuel_number == 4
+fuel='CH1.8'
+elseif fuel_number == 5
+fuel='C3H8'
+elseif fuel_number == 6
+fuel='H2'
+elseif fuel_number == 7
+fuel='CO'
+end
 
 %%
 
@@ -255,6 +266,9 @@ T_R = DewPoint(p_part_H2O);
 %%%%%%%%%%%%%%%%%
 % Tableau etats %
 %%%%%%%%%%%%%%%%%
+fig1=figure('units','normalized','outerposition',[0 0 1 1]);
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [175,880,300,40] ,...
+    'string' , 'Résulats' , 'fontsize' , 30 )
 
 p = [etat1.p;etat2.p;etat3.p;etat4.p;etat5.p;etat6.p;etat7.p;etat8.p;etat9_n(1).p];
 t = [etat1.t;etat2.t;etat3.t;etat4.t;etat5.t;etat6.t;etat7.t;etat8.t;etat9_n(1).t];
@@ -264,6 +278,13 @@ s = [etat1.s;etat2.s;etat3.s;etat4.s;etat5.s;etat6.s;etat7.s;etat8.s;etat9_n(1).
 e = [etat1.e;etat2.e;etat3.e;etat4.e;etat5.e;etat6.e;etat7.e;etat8.e;etat9_n(1).e];
 Etats = {'1';'2';'3';'4';'5';'6';'7';'8';'9'};
 Table = table(p,t,x,h,s,e,'RowNames',Etats);
+
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,700,330,40] ,...
+    'string' , 'Caractéristiques des états de la TV' , 'fontsize' , 15 )
+t1 = uitable(fig1);
+t1.Data = table2cell(Table);
+t1.Position = [75 500 500 198];
+t1.ColumnName = {'p [kPa]','T [°C]','x','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
  
 %%
 
@@ -302,7 +323,7 @@ label_en = {sprintf('\n %1.1f MW ',data_en(1)/1e3)...
             sprintf('\n %1.1f MW ',data_en(3)/1e3)...
             sprintf('\n %1.1f MW ',data_en(4)/1e3)};
    
-figure;
+subplot ( 'Position' , [ .66 .51 .3 .45 ] ) ;
 pie(data_en,label_en);
 title(sprintf('Flux énergétique primaire %1.1f MW',P_prim_en/1e3));
 legend('Puissance effective','Pertes mécaniques','Perte au condenseur','Pertes au générateur de vapeur');
@@ -317,8 +338,8 @@ label_ex = {sprintf('\n %1.1f MW ',data_ex(1)/1e3)...
          sprintf('\n %1.1f MW ',data_ex(6)/1e3)...
          sprintf('\n %1.1f MW ',data_ex(7)/1e3)...
          sprintf('\n %1.1f MW ',data_ex(8)/1e3)};
-         
-figure;
+     
+subplot ( 'Position' , [ .66 0.02 .3 .45 ] ) ;
 pie(data_ex,label_ex);
 title(sprintf('Flux énergétique primaire %1.1f MW',P_prim_ex/1e3));
 legend('Puissance effective','Pertes mécaniques','Perte au condenseur',...
@@ -333,9 +354,64 @@ legend('Puissance effective','Pertes mécaniques','Perte au condenseur',...
 % Graphes T-s et h-s %
 %%%%%%%%%%%%%%%%%%%%%%
 
-figure;
+subplot ( 'Position' , [ .42 .13 .2 .3 ] ) ;
 TS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
-figure;
+subplot ( 'Position' , [ .42 .6 .2 .3 ] ) ;
 HS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
+
+%Autres données affichées%
+%Débits%
+text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [445,440,300,40] ,...
+    'string' , 'Débits [kg/s]' , 'fontsize' , 15 )
+DEBITSt=[double(m_eau); double(m_vap); double(m_air); double(m_c)]
+DEBITS=table(DEBITSt,'RowNames',{'Eau'; 'Vapeur';'Air';'Carburant'})
+t4 = uitable(fig1);
+t4.Data = table2cell(DEBITS)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+t4.Position = [480 320 193 110];
+t4.RowName = {'Air'; 'Carburant';'Air';'Carburant'};
+t4.ColumnName= {''}
+
+%Point de rosée%
+text5 = uicontrol( fig1 , 'style' , 'text' , 'position' , [485,240,200,40] ,...
+    'string' , 'Temp. de rosée [°C]' , 'fontsize' , 15 )
+T_rosee=DewPoint(p_part_H2O);
+ROSEE=table(T_rosee,'RowNames',{'T_rosee'})
+t5 = uitable(fig1);
+t5.Data = table2cell(ROSEE);
+t5.Position = [500 180 165 58];
+t5.RowName = {'T_rosee'};
+t5.ColumnName= {''}
+
+%Rendements%
+text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [0,440,300,40] ,...
+    'string' , 'Rendements' , 'fontsize' , 15 )
+ETAt=[double(eta_gen); double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_gex); double(eta_rotex); double(eta_cyclex); double(eta_totex)]
+ETA=table(ETAt,'RowNames',{'eta_gen','eta_cyclen','eta_mec','eta_toten','eta_gex','eta_rotex','eta_cyclex','eta_totex'})
+t2 = uitable(fig1);
+t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+t2.Position = [50 250 200 180];
+t2.RowName = {'eta_gen','eta_cyclen','eta_mec','eta_toten','eta_gex','eta_rotex','eta_cyclex','eta_totex'};
+t2.ColumnName= {''}
+
+%Puissances%
+data_en = [P_e; p_mec_en; p_cyclen; p_gen]./1000;
+data_ex = [p_condensex;p_rotex; p_echangex; p_transex; p_chemex; p_combex]./1000;
+
+text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [230,440,300,40] ,...
+    'string' , 'Puissances [MW]' , 'fontsize' , 15 )
+PUISSANCEt=[data_en;data_ex]
+PUISSANCE=table(PUISSANCEt,'RowNames',{'P_e'; 'p_mec_en'; 'p_cyclen'; 'p_gen';'p_condensex';'p_rotex'; 'p_echangex'; 'p_transex'; 'p_chemex'; 'p_combex'})
+t3 = uitable(fig1);
+t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+t3.Position = [260 210 210 220];
+t3.RowName = {'P_e'; 'p_mec_en'; 'p_cyclen'; 'p_gen';'p_condensex';'p_rotex'; 'p_echangex'; 'p_transex'; 'p_chemex'; 'p_combex'};
+t3.ColumnName= {''}
+
+%Boutons%
+bp1 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [70 50 200 30 ] ,...
+    'string' , 'Nouvelle Turbine à vapeur' , 'callback' , @(bp1,eventdata)GUI_2(1))
+
+bp2 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [300 50 200 30 ] ,...
+    'string' , 'Retour au menu principal' , 'callback' , @(bp2,eventdata)GUI())
 
 end
