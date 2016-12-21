@@ -170,7 +170,7 @@ m4 = ((m_a+m_c)*(hf_HP-hf_BP)- m3*(h_HP_liq-Etat_p2.h))/(etat4.h-h_BP_liq);
 %Calcul de l'état 5g%
 %%%%%%%%%%%%%%%%%%%%%
 
-p5g=1
+p5g=100
 h5g=hf_BP-(m3+m4)*(Etat_p1.h-etat2.h)/(m_a+m_c);
 t5g= fzero(@(t) TGV_fT5g(h5g, frac_CO2, frac_H2O, frac_O2, frac_N2, t +273.15),100);
 s5g= sf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, t5g+273.15)
