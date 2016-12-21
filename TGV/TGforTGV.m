@@ -139,7 +139,11 @@ eta_rotex=(m_g*(h3-h4)-m_a*(h2-h1))/(m_g*(e3-e4)-m_a*(e2-e1));
 eta_cyclex=(m_g*(e3-e4)-m_a*(e2-e1))/(m_g*e3-m_a*e2);
 eta_combex=(m_g*e3-m_a*e2)/(m_c*ec);
 
-
-A=[p4*100 T4-273.15 h4 s4 e4 m_a m_c fuel PCI_massique ec lambda]
+p=[p1;p2;p3;p4]./1000;
+T=[T1;T2;T3;T4]-273.15;
+h=[h1;h2;h3;h4];
+s=[s1;s2;s3;s4];
+e=[e1;e2;e3;e4];
+A=[p T h s e m_a m_c fuel PCI_massique ec lambda]
 
 end

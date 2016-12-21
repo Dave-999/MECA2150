@@ -51,7 +51,7 @@ elseif strcmp(fuel,'CH1.8')
     Cp = 14.4/M; %capacite calorifique moyenne (273K-288K) du combustible [kJ/kgK]
     
 elseif strcmp(fuel,'CH4')
-    
+    disp(Hello
     z = 1;
     y = 4;
     x = 0;
