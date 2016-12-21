@@ -17,7 +17,7 @@ else
     if n_diff > 0
         for i = 1:n_diff
             h6_n(i) = etat6.h + i*(etat5.h-etat6.h)/(n_diff+1);
-            etat6_n(i) = Detente_6n(h6_n(i),etat5,eta_siT);
+            etat6_n(i) = Detente(h6_n(i),etat5,eta_siT);
         end
     end
     

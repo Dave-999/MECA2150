@@ -9,7 +9,7 @@
 
 %if nargin  == 0
     
-    P_e = 35*10^3; %puissance effective  /!\ [kW] /!\
+    P_e = 288*10^3; %puissance effective  /!\ [kW] /!\
     
     n_souti = 8; %nombre de resurchauffe
     n_resurch = 1; %nombre de soutirage
@@ -186,7 +186,7 @@ m_a = lambda*m_a1*m_c; %debit d'air
 eta_combex = m_f*(e_f - e_r)/(m_c*e_c);
 eta_chemex = m_f*(e_f - e_ech)/(m_f*(e_f - e_r));
 if n_resurch == 0
-    eta_transex = m_vG*(etat3.e-etat2.e)/(m_f*(ef - e_ech));
+    eta_transex = m_vG*(etat3.e-etat2.e)/(m_f*(e_f - e_ech));
 else
     eta_transex = (m_vG*(etat3.e-etat2.e) + m_v5*(etat5.e-etat4.e))/(m_f*(e_f - e_ech));
 end
@@ -227,9 +227,9 @@ eta_cyclex_den = m_vG/m_vC*(etat3.e-etat2.e) + m_v5/m_vC*(etat5.e-etat4.e);
 %----------Rendements exergetiques----------
 eta_gex;
 eta_rotex = eta_rotex_num/eta_rotex_den;
-eta_cyclex = eta_cyclex_num/eta_cyclex_den;
+eta_cyclex = eta_cyclex_num/eta_cyclex_den*eta_rotex;
 eta_mec;
-eta_totex = eta_gex*eta_rotex*eta_cyclex*eta_mec; %correct ?
+eta_totex = eta_gex*eta_cyclex*eta_mec;
 %-------------------------------------------
 
 %%
@@ -331,6 +331,9 @@ legend('Puissance effective','Pertes mécaniques','Perte au condenseur',...
 % Graphes T-s et h-s %
 %%%%%%%%%%%%%%%%%%%%%%
 
-
+figure;
+TS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
+figure;
+HS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
 
 %end
