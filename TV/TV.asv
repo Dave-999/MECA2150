@@ -325,7 +325,7 @@ label_en = {sprintf('\n %1.1f MW ',data_en(1)/1e3)...
             sprintf('\n %1.1f MW ',data_en(3)/1e3)...
             sprintf('\n %1.1f MW ',data_en(4)/1e3)};
    
-subplot ( 'Position' , [ .66 .51 .3 .45 ] ) ;
+subplot ( 'Position' , [ .66 .48 .3 .45 ] ) ;
 pie(data_en,label_en);
 title(sprintf('Flux énergétique primaire %1.1f MW',P_prim_en/1e3));
 legend('Puissance effective','Pertes mécaniques','Perte au condenseur','Pertes au générateur de vapeur');
@@ -356,9 +356,9 @@ legend('Puissance effective','Pertes mécaniques','Perte au condenseur',...
 % Graphes T-s et h-s %
 %%%%%%%%%%%%%%%%%%%%%%
 
-subplot ( 'Position' , [ .42 .13 .2 .3 ] ) ;
+subplot ( 'Position' , [ .40 .13 .2 .3 ] ) ;
 TS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
-subplot ( 'Position' , [ .42 .6 .2 .3 ] ) ;
+subplot ( 'Position' , [ .40 .6 .2 .3 ] ) ;
 HS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
 
 %Autres données affichées%
@@ -385,13 +385,13 @@ t5.RowName = {'T_rosee'};
 t5.ColumnName= {''}
 
 %Rendements$
-text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [0,440,300,40] ,...
+text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [10,440,300,40] ,...
     'string' , 'Rendements' , 'fontsize' , 15 )
 ETAt=[double(eta_gen); double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_gex); double(eta_rotex); double(eta_cyclex); double(eta_totex)]
 ETA=table(ETAt,'RowNames',{'eta_gen','eta_cyclen','eta_mec','eta_toten','eta_gex','eta_rotex','eta_cyclex','eta_totex'})
 t2 = uitable(fig1);
 t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t2.Position = [50 250 200 180];
+t2.Position = [60 250 200 180];
 t2.RowName = {'eta_gen','eta_cyclen','eta_mec','eta_toten','eta_gex','eta_rotex','eta_cyclex','eta_totex'};
 t2.ColumnName= {''}
 
@@ -405,7 +405,7 @@ PUISSANCEt=[data_en;data_ex]
 PUISSANCE=table(PUISSANCEt,'RowNames',{'P_e'; 'p_mec_en'; 'p_cyclen'; 'p_gen';'p_condensex';'p_rotex'; 'p_echangex'; 'p_transex'; 'p_chemex'; 'p_combex'})
 t3 = uitable(fig1);
 t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t3.Position = [260 210 210 220];
+t3.Position = [200 210 210 220];
 t3.RowName = {'P_e'; 'p_mec_en'; 'p_cyclen'; 'p_gen';'p_condensex';'p_rotex'; 'p_echangex'; 'p_transex'; 'p_chemex'; 'p_combex'};
 t3.ColumnName= {''}
 
