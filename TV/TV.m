@@ -1,4 +1,4 @@
-%function [] = TV()
+function [] = TV()
 %Turbine a vapeur - main function
 
 %%
@@ -7,7 +7,7 @@
 % Parametres %
 %%%%%%%%%%%%%%
 
-%if nargin  == 0
+if nargin  == 0
     
     P_e = 288*10^3; %puissance effective  /!\ [kW] /!\
     
@@ -26,20 +26,22 @@
     lambda = 1.05; %coefficient d'exces d'air
     fuel = 'CH4'; %combustible
     t_ech = 120; %temperature des fumees a l'echappement [°C]
-    t_a = 15; %tempreature de l'air ambiant [°C]
     p_calo = 0.01; %perte par déperditions calorifiques = 1% du PCI
-    dT_prechauf = 0; %pas de prechauffe du combustible et de l'air
+    dT_prechauf = 0; %prechauffe du combustible et du comburant
     
     %tour de refroidissement
-    t_sf_out = t6; %temperature de l'eau de refroidissement après le condenseur
-    p_air = 1; %pression de l'air de la tour [bar]
     t_air_in = 15; %temperature de l'air a l'entree de la tour
-    t_air_out = t_sf_out; %temperature de l'air a la sortie de la tour
     phi_air_in = 0.8; %humidite relative de l'air a l'entree de la tour
-    phi_air_out = 1; %humidite relative de l'air a la sortie de la tour
     
     
-%end
+end
+
+t_a = 15; %temperature de l'air ambiant [°C]
+
+t_sf_out = t6; %temperature de l'eau de refroidissement après le condenseur
+p_air = 1; %pression de l'air de la tour [bar]
+t_air_out = t_sf_out; %temperature de l'air a la sortie de la tour
+phi_air_out = 1; %humidite relative de l'air a la sortie de la tour
 
 %Limites en fin de détente : on doit verifier ?
 p_ech_min = 0.04; 
@@ -156,7 +158,7 @@ end
 
 m_vC = P_e/((W_turbine - W_pompe)*eta_mec); %debit au condenseur
 m_vG = m_vC*(1+sum(X)); %debit au generateur de vapeur
-m_vS = m_vG - m_vC; %debit total soutiré
+m_vS = m_vC*X; %debit total soutiré
 m_v5 = m_vC*(1+sum(X(1:n_souti-1))); %debit apres resurchauffe
 
 if n_souti < 4
@@ -173,7 +175,7 @@ p_ech = ((lambda*m_a1+1)*h_f_ech - lambda*m_a1*h_a)/PCI_massique;
 eta_gen = 1 - p_calo - p_ech; %eta_gen
 
 %le débit de combustible varie s'il y a resurchauffe ou pas
-if n_resurch ==0
+if n_resurch == 0
     m_c = m_vG*(etat3.h-etat2.h)/eta_gen/PCI_massique;
 else
     m_c = (m_vG*(etat3.h-etat2.h) + m_v5*(etat5.h-etat4.h))/eta_gen/PCI_massique;
@@ -336,4 +338,4 @@ TS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,e
 figure;
 HS(n_souti,n_resurch,etat1,etat2,etat3,etat4,etat5,etat6,etat6_n,etat7,etat7_n,etat8,etat9_n,eta_siT);
 
-%end
+end

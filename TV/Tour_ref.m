@@ -26,13 +26,13 @@ Cpv = 1.854; %[kJ/kgK]
 Cpl = 4.1868; %[kJ/kgK]
 h_lv = 2501.6; %[kJ/kg]
 
-x_air_in = 0.622*phi_air_in*XSteam('psat_T',t_air_in)/(p_air - XSteam('psat_T',t_air_in));
-x_air_out = 0.622*phi_air_out*XSteam('psat_T',t_air_out)/(p_air - XSteam('psat_T',t_air_out));
+x_air_in = 0.622*phi_air_in*XSteam('psat_T',t_air_in)/(p_air - phi_air_in*XSteam('psat_T',t_air_in));
+x_air_out = 0.622*phi_air_out*XSteam('psat_T',t_air_out)/(p_air - phi_air_out*XSteam('psat_T',t_air_out));
 
 h_air_in = Cpa*t_air_in + x_air_in*(h_lv + Cpv*t_air_in);
 h_air_out = Cpa*t_air_in + x_air_out*(h_lv + Cpv*t_air_out);
 
-m_eau = m_vC*(etat6.h-etat7.h)/Cpa/(t_sf_out - t_sf);
+m_eau = m_vC*(etat6.h-etat7.h)/Cpl/(t_sf_out - t_sf);
 m_air  = m_eau*Cpl*(t_sf_out - t_sf)/(h_air_out - h_air_in);
 m_vap = m_air*(x_air_out - x_air_in);
 

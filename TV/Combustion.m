@@ -129,6 +129,6 @@ fracP_N2 = a6*M_N2/m_produits;
 
 %Point de rosee
 frac_mol_H2O = a4/(a3+a4+a5+a6); %fraction molaire de H2O
-p_part_H2O = frac_mol_H2O*1e3; %pression partielle de H2O [Pa]
+p_part_H2O = frac_mol_H2O*1e3; %pression partielle de H2O [mbar]
 
 end
