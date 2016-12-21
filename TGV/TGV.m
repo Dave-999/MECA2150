@@ -1,4 +1,4 @@
-function [] = TGV(P_eTG, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_isP, eta_isT, eta_mec, p2, p3, delta_Ta, t_cond, pinch_cond, pinch_HP, pinch_BP)
+function [] = TGV(P_eTG, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_siP, eta_siT, eta_mec, p2, p3, dT_a, t_cond, dT_cond, pinch_HP, pinch_BP)
 
 if nargin == 0
 P_eTG=300;%[MW]
@@ -10,14 +10,14 @@ T3 = 1050; %[°C] valeur max
 k_cc = 0.95;
 r = 10;
 
-eta_isP = 0.9;
-eta_isT=0.9;
+eta_siP = 0.9;
+eta_siT=0.9;
 eta_mec = 0.95;
 p2 = 5.8;
 p3 = 78;
 t_cond = 15;
-delta_Ta =15;
-pinch_cond = 10;
+dT_a =15;
+dT_cond = 10;
 pinch_HP=10;
 pinch_BP=10;
 
@@ -72,7 +72,7 @@ s0 = XSteam('s_pT', 1, T0);
 %Etat 1%
 
 etat1 = struct;
-etat1.t = t_cond+pinch_cond;
+etat1.t = t_cond+dT_cond;
 etat1.p = XSteam('psat_T',etat1.t);
 etat1.h = XSteam('hL_T',etat1.t);
 etat1.s = XSteam('sL_T',etat1.t);
@@ -86,7 +86,7 @@ etat2.p = p2;
 
 dp = (etat2.p-etat1.p)*100;% On multiplie dp par 100 pour passer de bar à kPa 
 v_12 =  XSteam('v_ph',etat1.p,etat1.h); % volume supposé constant durant la compression
-etat2.h =  etat1.h + dp*v_12/eta_isP;
+etat2.h =  etat1.h + dp*v_12/eta_siP;
 etat2.t = XSteam('T_ph',etat2.p,etat2.h);
 etat2.s = XSteam('s_ph',etat2.p,etat2.h);
 etat2.e = Exergie(etat2.h,etat2.s);
@@ -95,7 +95,7 @@ etat2.x = NaN;
 %Etat 3%
 
 etat3 = struct;
-etat3.t = t4g-delta_Ta;
+etat3.t = t4g-dT_a;
 etat3.p = p3;
 etat3.h = XSteam('h_pT',etat3.p,etat3.t);
 etat3.s = XSteam('s_pT',etat3.p,etat3.t);
@@ -106,7 +106,7 @@ etat3.x = NaN;
 %Etat 4%
 etat4 = struct;
 etat4.p = p2;
-etat4.h = etat3.h+(XSteam('h_ps',etat4.p,etat3.s)-etat3.h)*eta_isT;
+etat4.h = etat3.h+(XSteam('h_ps',etat4.p,etat3.s)-etat3.h)*eta_siT;
 
 etat4.t = XSteam('T_ph',etat4.p,etat4.h);
 etat4.s = XSteam('s_ph',etat4.p,etat4.h);
@@ -115,8 +115,8 @@ etat4.x = NaN;
 
 %Etat 5%
 etat5 = struct;
-etat5.p = XSteam('psat_T', t_cond+pinch_cond);
-etat5.h = etat4.h+(XSteam('h_ps',etat5.p,etat4.s)-etat4.h)*eta_isT;
+etat5.p = XSteam('psat_T', t_cond+dT_cond);
+etat5.h = etat4.h+(XSteam('h_ps',etat5.p,etat4.s)-etat4.h)*eta_siT;
 
 etat5.t = XSteam('T_ph',etat5.p,etat5.h);
 etat5.s = XSteam('s_ph',etat5.p,etat5.h);
@@ -159,7 +159,7 @@ Etat_p1.e = (Etat_p1.h-h0)-(T0+273.15)*(Etat_p1.s-s0);
 Etat_p2 = struct;
 Etat_p2.p = etat3.p; 
 
-Etat_p2.h = Etat_p1.h + dp*v_12/eta_isP;
+Etat_p2.h = Etat_p1.h + dp*v_12/eta_siP;
 Etat_p2.t = XSteam('T_ph',Etat_p2.p,Etat_p2.h);
 Etat_p2.s = XSteam('s_ph',Etat_p2.p,Etat_p2.h);
 Etat_p2.e = (Etat_p2.h-h0)-(T0+273.15)*(Etat_p2.s-s0);
@@ -249,7 +249,7 @@ h_51=linspace(etat5.h,etat1.h,length);
 %Compression:
 for i=1:length
    dp = (p_12(i)-etat1.p)*100;% On multiplie dp par 100 pour passer de bar à kPa 
-h_12(i) =  etat1.h + dp*v_12/eta_isP;
+h_12(i) =  etat1.h + dp*v_12/eta_siP;
 T_12(i) = XSteam('T_ph',etat2.p,etat2.h);
 s_12(i) = XSteam('s_ph',etat2.p,etat2.h); 
 end
@@ -292,14 +292,14 @@ end
 
 %Détente HP
 for i= 1:length
-    p=XSteam('P_hs',etat3.h+(h_34(i)-etat3.h)/eta_isT,etat3.s);
+    p=XSteam('P_hs',etat3.h+(h_34(i)-etat3.h)/eta_siT,etat3.s);
     s_34(i)=XSteam('s_ph',p,h_34(i));
     T_34(i)=XSteam('T_ph',p,h_34(i));
 end
 
 %Détente BP
 for i=1:length
-    p=XSteam('P_hs',etat4.h+(h_45(i)-etat4.h)/eta_isT,etat4.s);
+    p=XSteam('P_hs',etat4.h+(h_45(i)-etat4.h)/eta_siT,etat4.s);
     s_45(i)=XSteam('s_ph',p,h_45(i));
     T_45(i)=XSteam('T_ph',p,h_45(i));
 end
