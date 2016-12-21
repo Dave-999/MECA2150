@@ -1,4 +1,4 @@
-function [PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2] = TVCombustion(fuel,lambda)
+function [PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, fracP_CO2, fracP_H2O, fracP_O2, fracP_N2, p_part_H2O] = TVCombustion(fuel,lambda)
 % Reaction de combustion pour differents combustibles
 
 % INPUT

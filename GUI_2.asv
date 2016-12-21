@@ -116,11 +116,11 @@ if cycle == 3
     
     
     text11 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,300,50,15] , 'Max' , 1 , 'string' , '5.8' );
-    ui11 = uicontrol ( fig , 'style' , ' text' , 'position', [10,300,150,15] , 'string' , 'Pression de vapeur à BP (p2)' );
+    ui11 = uicontrol ( fig , 'style' , ' text' , 'position', [10,300,150,15] , 'string' , 'Pression de vapeur à HP (p3)' );
     unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [230,300,30,15] , 'string' , '[bar]' );
     
     text12 = uicontrol ( fig , 'style' , ' edit' , 'position', [440,300,50,15] , 'Max' , 1 , 'string' , '78' );
-    ui12 = uicontrol ( fig , 'style' , ' text' , 'position', [280,300,150,15] , 'string' , 'Pression de vapeur HP (p3)');
+    ui12 = uicontrol ( fig , 'style' , ' text' , 'position', [280,300,150,15] , 'string' , 'Pression de vapeur HP (p2)');
 unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [500,300,30,15] , 'string' , '[bar]' );
 
     text13 = uicontrol ( fig , 'style' , ' edit' , 'position', [170,260,50,15] , 'Max' , 1 , 'string' , '0.9');
@@ -156,7 +156,7 @@ unit11 = uicontrol ( fig , 'style' , ' text' , 'position', [500,300,30,15] , 'st
     unit20 = uicontrol ( fig , 'style' , ' text' , 'position', [500,126,30,15] , 'string' , '[°C]' );
     
     bp1 = uicontrol ( fig , 'style' , 'push' , 'position' , [420 50 60 30 ] ,...
-        'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TGV(str2double(get(text3,'String')), get(text4,'Value'), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text6,'String')), str2double(get(text5,'String')), str2double(get(text10,'String')), str2double(get(text14,'String')), str2double(get(text13,'String')),str2double(get(text15,'String')),str2double(get(text11,'String')),str2double(get(text12,'String')),str2double(get(text16,'String')),str2double(get(text17,'String')),str2double(get(text18,'String')),str2double(get(text19,'String')),str2double(get(text20,'String'))))
+        'string' , 'Démarrer' , 'callback' , @(bp1,eventdata) TGV(str2double(get(text3,'String')), get(text4,'Value'), str2double(get(text7,'String')), str2double(get(text8,'String')), str2double(get(text9,'String')), str2double(get(text6,'String')), str2double(get(text5,'String')), str2double(get(text10,'String')), stre2double(get(text14,'String')), stre2double(get(text13,'String')),stre2double(get(text15,'String'))))
     %TGV(TGP_e, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_isP, eta_isT, eta_mec, p2, p3, delta_Ta, t_cond, pinch_cond, pinch_HP, pinch_BP)
 
 end

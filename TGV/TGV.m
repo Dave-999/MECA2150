@@ -1,7 +1,7 @@
-function [] = TGV(TGP_e, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_isP, eta_isT, eta_mec, p2, p3, delta_Ta, t_cond, pinch_cond, pinch_HP, pinch_BP)
+function [] = TGV(P_eTG, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r , eta_isP, eta_isT, eta_mec, p2, p3, delta_Ta, t_cond, pinch_cond, pinch_HP, pinch_BP)
 
 if nargin == 0
-TGP_e=300;%[MW]
+P_eTG=300;%[MW]
 fuel_number = 1;
 eta_piC = 0.9;
 eta_piT = 0.9;
@@ -20,17 +20,16 @@ p2 = 5.8;
 p3 = 78;
 t_cond = 15;
 delta_Ta =15;
-pinch_cond = 8;
+pinch_cond = 10;
 pinch_HP=10;
 pinch_BP=10;
 
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Calculs de la turbine à gaz%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-A = TGforTGV(TGP_e, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r);
+A = TGforTGV(P_eTG, fuel_number, eta_piC, eta_piT, k_mec, T3, k_cc, r);
 
 %Etats de la TG%
 p1g = double(A(1,1));
@@ -143,7 +142,10 @@ end
 T_HP = XSteam('Tsat_p',Etat3.p);
 T_cBP = XSteam('Tsat_p',Etat4.p);
 
-[PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, frac_CO2, frac_H2O, frac_O2, frac_N2] = TVCombustion(fuel,lambda);
+[PCI_massique, e_c, Cp, m_a1, fracR_c, fracR_O2, fracR_N2, frac_CO2, frac_H2O, frac_O2, frac_N2,p_part_H2O] = TVCombustion(fuel,lambda);
+%T_rosée
+T_rosee=DewPoint(p_part_H2O);
+
 hf_HP=hf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, T_HP + pinch_HP +273.15);
 hf_BP=hf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, T_cBP + pinch_BP +273.15);
 %HP%
@@ -177,21 +179,36 @@ m4 = ((m_a+m_c)*(hf_HP-hf_BP)- m3*(h_HP_liq-Etat_p2.h))/(Etat4.h-h_BP_liq);
 %Calcul de l'état 5g%
 %%%%%%%%%%%%%%%%%%%%%
 
+p5g=1
 h5g=hf_BP-(m3+m4)*(Etat_p1.h-Etat2.h)/(m_a+m_c);
-T5g= fzero(@(t) TGV_fT5g(h5g, frac_CO2, frac_H2O, frac_O2, frac_N2, t +273.15),100);
+t5g= fzero(@(t) TGV_fT5g(h5g, frac_CO2, frac_H2O, frac_O2, frac_N2, t +273.15),100);
+s5g= sf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, t5g+273.15)
+e5g= h5g- hf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, 288.15) - 273.15*(s5g- sf_Fumee(frac_CO2, frac_H2O, frac_O2, frac_N2, 288.15))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %Rendements et puissances%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
+P_prim_en = m_c*PCI_massique;
+P_prim_ex = m_c*ec;
+P_m = (m3+m4)*(Etat4.h-Etat5.h)+m3*(Etat3.h-Etat4.h); %Pour la TV
+P_eTV = P_m*eta_mec;
+P_fmec = P_m*(1-eta_mec)+P_eTG*k_mec/(1-k_mec);
 
+P_cond_en = (m3+m4)*(Etat5.h-Etat1.h);
+P_echap_en = m_a*(h5g-h1g);
 
+P_irr_comb = P_prim_ex-((m_a+m_c)*e3g-m_a*e2g);
+P_cond_ex = (m3+m4)*(Etat5.e-Etat1.e);
+P_gen_vap = (m_a+m_c)*(e4g-e5g)-(m3*(Etat3.e-Etat2.e)+m4*(Etat4.e-Etat2.e));
+P_echap_ex = (m_a+m_c)*e5g
 
-
-
-
-
-
+P_cTG_ex = m_a*((h2g-h1g)-(e2g-e1g)) %Compresseur TG
+P_tTG_ex = (m_a+m_c)*(h3g-h4g)*(1-(h3g-h4g)/(e3g-e4g)) %Turbine TG
+P_tTV_ex = m3*(Etat3.h-Etat4.h)*(1-(Etat3.h-Etat4.h)/(Etat3.e-Etat4.e))+m4*(Etat4.h-Etat5.h)*(1-(Etat4.h-Etat5.h)/(Etat4.e-Etat5.e)) %Turbine TV
+P_pTV_ex = (m3+m4)*((Etat2.h-Etat1.h)-(Etat2.e-Etat1.e))+m3*((Etat_p2.h-Etat_p1.h)-(Etat_p2.e-Etat_p1.e)) %Pompe TV
+P_rotex=P_cTG_ex+P_tTG_ex+P_tTV_ex+P_pTV_ex;
+P_irr_therm = P_prim_ex - P_irr_comb- P_cond_ex - P_gen_vap - P_echap_ex - P_fmec - P_eTV - P_eTG*1000 - P_rotex;
 
 %%%%%%%
 %Plots%
@@ -200,7 +217,7 @@ T5g= fzero(@(t) TGV_fT5g(h5g, frac_CO2, frac_H2O, frac_O2, frac_N2, t +273.15),1
 %%%%%%%%%%%
 %T-s%
 
-length = 50;
+length = 10;
 
 T_12=zeros(1,length);
 T_cBP=zeros(1,length);
@@ -232,7 +249,7 @@ h_cBP=linspace(Etat2.h,XSteam('hL_p',Etat2.p),length);
 h_vBP=linspace(XSteam('hL_p',Etat2.p),XSteam('hV_p',Etat3.p),length);
 h_cHP=linspace(Etat_p2.h,XSteam('hV_p',Etat2.p),length);
 h_sBP=linspace(Etat4.h, XSteam('hV_p',Etat2.p),length);
-h_vHP=linspace(XSteam('hL_p',Etat3.p),XSteam('hV_p',Etat3.p),length)
+h_vHP=linspace(XSteam('hL_p',Etat3.p),XSteam('hV_p',Etat3.p),length);
 h_sHP=linspace(Etat3.h, XSteam('hV_p',Etat3.p),length);
 h_34=linspace(Etat3.h,Etat4.h,length);
 h_45=linspace(Etat4.h,Etat5.h,length);
@@ -248,8 +265,8 @@ end
 
 %Chauffage à BP:
 for i= 1:length
-  s_cBP(i)=XSteam('s_ph',Etat2.p,h_cBP(i))
-  T_cBP(i)=XSteam('T_ph',Etat2.p,h_cBP(i))
+  s_cBP(i)=XSteam('s_ph',Etat2.p,h_cBP(i));
+  T_cBP(i)=XSteam('T_ph',Etat2.p,h_cBP(i));
 end
 
 %Vaporisation à BP:
@@ -260,14 +277,14 @@ end
 
 %Chauffage à HP:
 for i= 1:length
-  s_cHP(i)=XSteam('s_ph',Etat3.p,h_cHP(i))
-  T_cHP(i)=XSteam('T_ph',Etat3.p,h_cHP(i))
+  s_cHP(i)=XSteam('s_ph',Etat3.p,h_cHP(i));
+  T_cHP(i)=XSteam('T_ph',Etat3.p,h_cHP(i));
 end
 
 %Surchauffe à BP:
 for i= 1:length
-  s_sBP(i)=XSteam('s_ph',Etat2.p,h_sBP(i))
-  T_sBP(i)=XSteam('T_ph',Etat2.p,h_sBP(i))
+  s_sBP(i)=XSteam('s_ph',Etat2.p,h_sBP(i));
+  T_sBP(i)=XSteam('T_ph',Etat2.p,h_sBP(i));
 end
 
 %Vaporisation à HP:
@@ -284,7 +301,7 @@ end
 
 %Détente HP
 for i= 1:length
-    p=XSteam('P_hs',Etat3.h+(h_34(i)-Etat3.h)/eta_isT,Etat3.s)
+    p=XSteam('P_hs',Etat3.h+(h_34(i)-Etat3.h)/eta_isT,Etat3.s);
     s_34(i)=XSteam('s_ph',p,h_34(i));
     T_34(i)=XSteam('T_ph',p,h_34(i));
 end
@@ -370,109 +387,126 @@ xlabel('Entropie [J/kgK]')
 ylabel('Enthalpie [kJ/kg]')
 
 
-%%%%%%%%%%%%
+%%%%%%%%%%%
 %Pie Chart%
-%%%%%%%%%%%%
+%%%%%%%%%%%
 
-% %Energetique%
-% 
-% P_prim_en=m_c*PCI_massique;
-% P_echap_en = (h4-e1)*m_g;
-% P=[double(P_e) double(P_fmec) double(P_echap_en)];
-% 
-% label={sprintf('Puissance effective \n %0.1f MW ',P_e/1e3)...
-%     sprintf('Pertes mécaniques \n %0.1f MW ',P_fmec/1e3)...
-%     sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_en/1e3)};
-% subplot ( 'Position' , [ .66 .48 .3 .45 ] ) ;
-% pie(P,label);
-% title(sprintf('Distribution du flux énergétique avec puissance primaire de %0.1f  MW',P_prim_en/1e3 ));
-% 
-% %Exergetique%
-% 
-% P_prim_ex=ec*m_c;
-% P_irr_comb = P_prim_ex*(1-eta_combex);
-% P_echap_ex = (e4-e1)*m_g;
-% P_irr_tc = (e3-e4)*m_g - (e2-e1)*m_a- (h3-h4)*m_g + (h2-h1)*m_a;
-% P=[double(P_e) double(P_fmec) double(P_irr_tc) double(P_echap_ex) double(P_irr_comb)];
-% 
-% label={sprintf('Puissance effective \n %0.1f MW ',P_e/1e3)...
-%     sprintf('Pertes mécaniques \n %0.1f MW ',P_fmec/1e3)...
-%     sprintf('Irréversibilités à la turbine et au compresseur \n %0.1f MW ',P_irr_tc/1e3)...
-%     sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_ex/1e3)...
-%     sprintf('Irréversibilités de la combustion: \n %0.1f MW ',P_irr_comb/1e3)};
-% 
-% subplot ( 'Position' , [ .66 0.02 .3 .45 ] ) ;
-% pie(P,label);
-% title(sprintf('Distribution du flux exergétique avec puissance primaire de %0.1f  MW',P_prim_ex/1e3 ));
+%Energetique%
+
+P=[double(P_eTG)*1000 double(P_eTV) double(P_fmec) double(P_cond_en) double(P_echap_en)]
+
+label={sprintf('Puissance effective TG \n %0.1f MW ',P_eTG)...
+    sprintf('Puissance effective TV \n %0.1f MW ',P_eTV/1e3)...
+    sprintf('Pertes mécaniques \n %0.1f MW ',P_fmec/1e3)...
+    sprintf('Pertes au condenseur: \n %0.1f MW ',P_cond_en/1e3)...
+    sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_en/1e3)};
+subplot ( 'Position' , [ .66 .515 .3 .45 ] ) ;
+pie(P,label);
+title(sprintf('Distribution du flux énergétique avec puissance primaire de %0.1f  MW',P_prim_en/1e3 ));
+
+%Exergetique%
+
+P=[double(P_eTG)*1000 double(P_eTV)  double(P_fmec) double(P_cond_ex) double(P_rotex) double(P_echap_ex) double(P_irr_therm) double(P_irr_comb)]
+
+label={sprintf('Puissance effective TG \n %0.1f MW ',P_eTG)...
+    sprintf('Puissance effective TV \n %0.1f MW ',P_eTV/1e3)...
+    sprintf('Pertes mécaniques \n %0.1f MW ',P_fmec/1e3)...
+    sprintf('Pertes au condenseur: \n %0.1f MW ',P_cond_ex/1e3)...
+    sprintf('Irréversibilités au complexe rotorique: \n %0.1f MW ',P_rotex/1e3)...
+    sprintf('Pertes à l''échappement: \n %0.1f MW ',P_echap_ex/1e3)...
+    sprintf('Irréversibilité du transfert thermique \n %0.1f MW ',P_irr_therm/1e3)...    
+    sprintf('Irréversibilités de la combustion: \n %0.1f MW ',P_irr_comb/1e3)};
+
+subplot ( 'Position' , [ .66 0.02 .3 .45 ] ) ;
+pie(P,label);
+title(sprintf('Distribution du flux exergétique avec puissance primaire de %0.1f  MW',P_prim_ex/1e3 ));
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %Tableaux des résulats%
 %%%%%%%%%%%%%%%%%%%%%9%
 %Caractéristiques des états$
 %Pour la TG
-pg=[p1g;p2g;p3g;p4g];
-Tg=[t1g;t2g;t3g;t4g];
-hg=[h1g;h2g;h3g;h4g];
-sg=[s1g;s2g;s3g;s4g];
-eg=[e1g;e2g;e3g;e4g];
-Etatsg={'1';'2';'3';'4'};
+pg=[p1g;p2g;p3g;p4g;p5g];
+tg=[t1g;t2g;t3g;t4g;t5g];
+hg=[h1g;h2g;h3g;h4g;h5g];
+sg=[s1g;s2g;s3g;s4g;s5g];
+eg=[e1g;e2g;e3g;e4g;e5g];
+Etatsg={'1g';'2g';'3g';'4g';'5g'};
 
-Table = table(pg,Tg,hg,sg,eg,'RowNames',Etatsg)
+Table = table(pg,tg,hg,sg,eg,'RowNames',Etatsg)
 
 
-text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,680,330,40] ,...
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,686,330,40] ,...
     'string' , 'Caractéristiques des états de la TG' , 'fontsize' , 15 )
 t1 = uitable(fig1);
 t1.Data = table2cell(Table);
-t1.Position = [110 565 425 108];
+t1.Position = [110 561 425 132];
 t1.ColumnName = {'p [kPa]','T [°C]','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
 
-%Rendements$
-text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,515,300,40] ,...
-    'string' , 'Rendements' , 'fontsize' , 15 )
-ETAt=[double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_rotex); double(eta_cyclex); double(eta_combex); double(eta_totex)]
-ETA=table(ETAt,'RowNames',{'eta_cyclen'; 'eta_mec'; 'eta_toten'; 'eta_rotex'; 'eta_cyclex'; 'eta_combex'; 'eta_totex'})
-t2 = uitable(fig1);
-t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t2.Position = [210 355 200 160];
-t2.RowName = {'eta_cyclen','eta_mec','eta_toten','eta_rotex','eta_cyclex','eta_combex','eta_totex'};
-t2.ColumnName= {''}
+%Pour la TV
 
-%Puissances$
-text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [40,310,300,40] ,...
-    'string' , 'Puissances [MW]' , 'fontsize' , 15 )
-PUISSANCEt=[double(P_mT); double(P_mC); double(P_fmec); double(P_prim_en); double(P_echap_en); double(P_prim_ex); double(P_irr_comb);double(P_echap_ex);double(P_irr_tc)]/1000
-PUISSANCE=table(PUISSANCEt,'RowNames',{'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'})
-t3 = uitable(fig1);
-t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t3.Position = [80 115 205 195];
-t3.RowName = {'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'};
-t3.ColumnName= {''}
+p=[Etat1.p;Etat2.p;Etat3.p;Etat4.p;Etat5.p];
+t=[Etat1.t;Etat2.t;Etat3.t;Etat4.t;Etat5.t];
+h=[Etat1.h;Etat2.h;Etat3.h;Etat4.h;Etat5.h];
+s=[Etat1.s;Etat2.s;Etat3.s;Etat4.s;Etat5.s];
+e=[Etat1.e;Etat2.e;Etat3.e;Etat4.e;Etat5.e];
+Etats={'1';'2';'3';'4';'5'};
+
+Table = table(p,t,h,s,e,'RowNames',Etats)
+
+
+text1 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,500,330,40] ,...
+    'string' , 'Caractéristiques des états de la TV' , 'fontsize' , 15 )
+t1 = uitable(fig1);
+t1.Data = table2cell(Table);
+t1.Position = [110 375 425 132];
+t1.ColumnName = {'p [kPa]','T [°C]','h [kJ/kg]','s [kJ/kgK]','e [kJ/kg]'};
+% %Rendements$
+% text2 = uicontrol( fig1 , 'style' , 'text' , 'position' , [170,300,300,40] ,...
+%     'string' , 'Rendements' , 'fontsize' , 15 )
+% ETAt=[double(eta_cyclen); double(eta_mec); double(eta_toten); double(eta_rotex); double(eta_cyclex); double(eta_combex); double(eta_totex)]
+% ETA=table(ETAt,'RowNames',{'eta_cyclen'; 'eta_mec'; 'eta_toten'; 'eta_rotex'; 'eta_cyclex'; 'eta_combex'; 'eta_totex'})
+% t2 = uitable(fig1);
+% t2.Data = table2cell(ETA)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+% t2.Position = [210 355 200 160];
+% t2.RowName = {'eta_cyclen','eta_mec','eta_toten','eta_rotex','eta_cyclex','eta_combex','eta_totex'};
+% t2.ColumnName= {''}
+% 
+% %Puissances$
+% text3 = uicontrol( fig1 , 'style' , 'text' , 'position' , [40,310,300,40] ,...
+%     'string' , 'Puissances [MW]' , 'fontsize' , 15 )
+% PUISSANCEt=[double(P_mT); double(P_mC); double(P_fmec); double(P_prim_en); double(P_echap_en); double(P_prim_ex); double(P_irr_comb);double(P_echap_ex);double(P_irr_tc)]/1000
+% PUISSANCE=table(PUISSANCEt,'RowNames',{'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'})
+% t3 = uitable(fig1);
+% t3.Data = table2cell(PUISSANCE)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
+% t3.Position = [80 115 205 195];
+% t3.RowName = {'P_mT'; 'P_mC'; 'P_fmec'; 'P_prim_en'; 'P_echap_en'; 'P_prim_ex'; 'P_irr_comb';'P_echap_ex';'P_irr_tc'};
+% t3.ColumnName= {''}
 
 %Débits$
-text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [270,310,300,40] ,...
+text4 = uicontrol( fig1 , 'style' , 'text' , 'position' , [310,320,300,40] ,...
     'string' , 'Débits [kg/s]' , 'fontsize' , 15 )
-DEBITSt=[double(m_a); double(m_c)]
-DEBITS=table(DEBITSt,'RowNames',{'Air'; 'Carburant'})
+DEBITSt=[double(m_a); double(m_c); m3; m4]
+DEBITS=table(DEBITSt,'RowNames',{'Air'; 'Carburant'; 'Vapeur au point 3'; 'Vapeur au point 4'})
 t4 = uitable(fig1);
 t4.Data = table2cell(DEBITS)%{eta_cyclen; eta_mec; eta_toten; eta_rotex; eta_cyclex; eta_combex; eta_totex}
-t4.Position = [315 240 190 70];
-t4.RowName = {'Air'; 'Carburant'};
+t4.Position = [315 210 280 110];
+t4.RowName = {'Air'; 'Carburant'; 'Vapeur au point 3'; 'Vapeur au point 4'};
 t4.ColumnName= {''}
 
 %Point de rosée%
-text5 = uicontrol( fig1 , 'style' , 'text' , 'position' , [320,180,200,40] ,...
+text5 = uicontrol( fig1 , 'style' , 'text' , 'position' , [360,160,200,40] ,...
     'string' , 'Temp. de rosée [°C]' , 'fontsize' , 15 )
 ROSEE=table(T_rosee,'RowNames',{'T_rosee'})
 t5 = uitable(fig1);
 t5.Data = table2cell(ROSEE);
-t5.Position = [335 120 165 58];
+t5.Position = [375 100 165 58];
 t5.RowName = {'T_rosee'};
 t5.ColumnName= {''}
 
 %Boutons%
 bp1 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [70 50 200 30 ] ,...
-    'string' , 'Nouvelle Turbine à gaz' , 'callback' , @(bp1,eventdata)GUI_2(2))
+    'string' , 'Nouvelle TGV' , 'callback' , @(bp1,eventdata)GUI_2(3))
 
 bp2 = uicontrol ( fig1 , 'style' , 'push' , 'position' , [300 50 200 30 ] ,...
     'string' , 'Retour au menu principal' , 'callback' , @(bp2,eventdata)GUI())
