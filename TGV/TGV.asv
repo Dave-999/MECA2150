@@ -101,26 +101,29 @@ etat3.h = XSteam('h_pT',etat3.p,etat3.t);
 etat3.s = XSteam('s_pT',etat3.p,etat3.t);
 etat3.e = Exergie(etat3.h,etat3.s);
 etat3.x = NaN;
-
+end
 
 %Etat 4%
 etat4 = struct;
-etat4.p = p2;
-etat4.h = etat3.h+(XSteam('h_ps',etat4.p,etat3.s)-etat3.h)*eta_isT;
+etat4.p=p2;
+etat4.h=etat3.h+(XSteam('h_ps',etat4.p,etat3.s)-etat3.h)*eta_isT;
 
-etat4.t = XSteam('T_ph',etat4.p,etat4.h);
-etat4.s = XSteam('s_ph',etat4.p,etat4.h);
+etat4.t=XSteam('T_ph',etat4.p,etat4.h);
+etat4.s=XSteam('s_ph',etat4.p,etat4.h);
 etat4.e = Exergie(etat4.h,etat4.s);
-etat4.x = NaN;
+etat4.x = XSteam('x_ph',etat4.p,etat4.h);
+if etat4.x>1 || etat4.x<0
+    etat4.x = NaN;
+end
 
 %Etat 5%
-etat5 = struct;
-etat5.p = XSteam('psat_T', t_cond+pinch_cond);
-etat5.h = etat4.h+(XSteam('h_ps',etat5.p,etat4.s)-etat4.h)*eta_isT;
+etat5=struct;
+etat5.p=XSteam('psat_T', t_cond+pinch_cond);
+etat5.h=etat4.h+(XSteam('h_ps',etat5.p,etat4.s)-etat4.h)*eta_isT;
 
-etat5.t = XSteam('T_ph',etat5.p,etat5.h);
-etat5.s = XSteam('s_ph',etat5.p,etat5.h);
-etat5.e = Exergie(etat5.h,etat5.s);
+etat5.t=XSteam('T_ph',etat5.p,etat5.h);
+etat5.s=XSteam('s_ph',etat5.p,etat5.h);
+etat5.e = Exergie(etat4.h,etat4.s);
 etat5.x = XSteam('x_ph',etat5.p,etat5.h);
 if etat5.x>1 || etat5.x<0
     etat5.x = NaN;
